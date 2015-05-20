@@ -195,7 +195,8 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
                 mAmbient = inAmbientMode;
                 if (mLowBitAmbient) {
                     mCenter.setAntiAlias(!inAmbientMode);
-                    mStatus.setAntiAlias(!inAmbientMode);
+                    // こっちはめちゃ汚くなる
+                    // mStatus.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }

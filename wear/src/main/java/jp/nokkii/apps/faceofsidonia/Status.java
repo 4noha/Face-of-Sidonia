@@ -11,24 +11,36 @@ import android.text.format.Time;
  */
 public class Status {
     Paint mTextPaint;
+    Paint mLeftTextPaint;
 
-    float mTextXOffset;
-    float mTextYOffset;
+    float mTextXOffset ,mLeftTextXOffset;
+    float mTextYOffset ,mLeftTextYOffset;
 
     public Status(FaceOfSidonia watch) {
         Resources resources = watch.getResources();
 
-        float statusTextSize = resources.getDimension(R.dimen.status_text_size);
+        float textSize = resources.getDimension(R.dimen.status_text_size);
+        float leftTextSize = resources.getDimension(R.dimen.status_text_size) - 33;
         Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "Browning.ttf");
 
+        // 右側
         mTextPaint = new Paint();
         mTextXOffset = resources.getDimension(R.dimen.status_text_x_offset);
         mTextYOffset = resources.getDimension(R.dimen.status_text_y_offset);
 
         mTextPaint.setTypeface(typeface);
         mTextPaint.setColor(resources.getColor(R.color.digital_background));
-        mTextPaint.setTextSize(statusTextSize);
+        mTextPaint.setTextSize(textSize);
         mTextPaint.setAntiAlias(true);
+
+        // 左側
+        mLeftTextPaint = new Paint();
+        mLeftTextXOffset = resources.getDimension(R.dimen.status_text_x_offset) - 21;
+        mLeftTextYOffset = resources.getDimension(R.dimen.status_left_text_y_offset);
+        mLeftTextPaint.setTypeface(typeface);
+        mLeftTextPaint.setColor(resources.getColor(R.color.digital_background));
+        mLeftTextPaint.setTextSize(leftTextSize);
+        mLeftTextPaint.setAntiAlias(true);
     }
 
     public void setAntiAlias(Boolean mode){
@@ -36,8 +48,16 @@ public class Status {
     }
 
     public void drawTime(Canvas canvas, Time time) {
-        String text = String.format("%4d",
-                time.minute > 9 ? time.hour * 100 + time.minute : time.hour * 10 + time.minute);
+        int hour12 = time.hour > 11 ? time.hour - 12 : time.hour;
+        String text = String.valueOf(hour12%10) +
+                (time.minute > 9 ? String.valueOf(time.minute) :
+                String.valueOf(0) + String.valueOf(time.minute));
+
+        canvas.drawText("T", mLeftTextXOffset, mLeftTextYOffset, mLeftTextPaint);
+        if (time.hour > 11)
+            canvas.drawText("P", mLeftTextXOffset, mLeftTextYOffset + 27, mLeftTextPaint);
+        else
+            canvas.drawText("A", mLeftTextXOffset, mLeftTextYOffset + 27, mLeftTextPaint);
         canvas.drawText(text, mTextXOffset, mTextYOffset, mTextPaint);
     }
 }

@@ -35,7 +35,6 @@ import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
-import android.widget.Switch;
 
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -92,15 +91,12 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
         boolean mRegisteredTimeZoneReceiver = false;
 
-        Paint mBackgroundPaint;
-        Paint mTextPaint;
+        CenterPoint mCenter;
 
+        Paint mBackgroundPaint;
         boolean mAmbient;
 
         Time mTime;
-
-        float mXOffset;
-        float mYOffset;
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -118,13 +114,11 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
                     .setShowSystemUiTime(false)
                     .build());
             Resources resources = FaceOfSidonia.this.getResources();
-            mYOffset = resources.getDimension(R.dimen.digital_y_offset);
 
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(resources.getColor(R.color.digital_background));
 
-            mTextPaint = new Paint();
-            mTextPaint = createTextPaint(resources.getColor(R.color.digital_text));
+            mCenter = new CenterPoint(FaceOfSidonia.this);
 
             mTime = new Time();
         }
@@ -133,14 +127,6 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
         public void onDestroy() {
             mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
             super.onDestroy();
-        }
-
-        private Paint createTextPaint(int textColor) {
-            Paint paint = new Paint();
-            paint.setColor(textColor);
-            paint.setTypeface(NORMAL_TYPEFACE);
-            paint.setAntiAlias(true);
-            return paint;
         }
 
         @Override
@@ -185,13 +171,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
             // Load resources that have alternate values for round watches.
             Resources resources = FaceOfSidonia.this.getResources();
-            boolean isRound = insets.isRound();
-            mXOffset = resources.getDimension(isRound
-                    ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-            float textSize = resources.getDimension(isRound
-                    ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
-
-            mTextPaint.setTextSize(textSize);
+            // boolean isRound = insets.isRound();
         }
 
         @Override
@@ -212,7 +192,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             if (mAmbient != inAmbientMode) {
                 mAmbient = inAmbientMode;
                 if (mLowBitAmbient) {
-                    mTextPaint.setAntiAlias(!inAmbientMode);
+                    mCenter.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }
@@ -234,18 +214,14 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
             String hour_l = changeKanji(mTime.hour%10);
-            String hour_h = changeKanji((int)mTime.hour/10);
+            String hour_h = changeKanji(mTime.hour/10);
             String min_l = changeKanji(mTime.minute%10);
-            String min_h = changeKanji((int)mTime.minute/10);
+            String min_h = changeKanji(mTime.minute/10);
 
-            String text = mAmbient
-                    ? String.format("%d:%02d", mTime.hour, mTime.minute)
-                    : String.format("%d:%02d:%02d", mTime.hour, mTime.minute, mTime.second);
-            text = "    " + hour_h + "  " + hour_l;
-            canvas.drawText(text, mXOffset, mYOffset+3, mTextPaint);
-            text = "    " + min_h + "  " + min_l;
-            canvas.drawText(text, mXOffset, mYOffset+92, mTextPaint);
+            mCenter.drawText(canvas, hour_h, hour_l, min_h, min_l);
+            );
         }
+
         private String changeKanji(int num) {
             String c = "";
 
@@ -302,5 +278,13 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
         private boolean shouldTimerBeRunning() {
             return isVisible() && !isInAmbientMode();
         }
+    }
+
+    public Paint createTextPaint(int textColor) {
+        Paint paint = new Paint();
+        paint.setColor(textColor);
+        paint.setTypeface(NORMAL_TYPEFACE);
+        paint.setAntiAlias(true);
+        return paint;
     }
 }

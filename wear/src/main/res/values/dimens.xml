@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="digital_text_size">53dp</dimen>
-    <dimen name="status_text_size">30dp</dimen>
+    <dimen name="status_text_size">41dp</dimen>
     <dimen name="digital_text_size_round">45dp</dimen>
     <dimen name="digital_x_offset">50dp</dimen>
     <dimen name="digital_x_offset_round">25dp</dimen>
     <dimen name="digital_y_offset">98dp</dimen>
-    <dimen name="status_text_x_offset">105dp</dimen>
-    <dimen name="status_text_y_offset">36dp</dimen>
+    <dimen name="status_text_x_offset">103dp</dimen>
+    <dimen name="status_text_y_offset">41dp</dimen>
+    <dimen name="status_left_text_x_offset">89dp</dimen>
+    <dimen name="status_left_text_y_offset">23dp</dimen>
 </resources>

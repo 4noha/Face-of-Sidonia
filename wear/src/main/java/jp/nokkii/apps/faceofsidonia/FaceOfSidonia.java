@@ -91,6 +91,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
         boolean mRegisteredTimeZoneReceiver = false;
 
+        Status mStatus;
         CenterPoint mCenter;
 
         Paint mBackgroundPaint;
@@ -119,6 +120,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             mBackgroundPaint.setColor(resources.getColor(R.color.digital_background));
 
             mCenter = new CenterPoint(FaceOfSidonia.this);
+            mStatus = new Status(FaceOfSidonia.this);
 
             mTime = new Time();
         }
@@ -193,6 +195,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
                 mAmbient = inAmbientMode;
                 if (mLowBitAmbient) {
                     mCenter.setAntiAlias(!inAmbientMode);
+                    mStatus.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }
@@ -219,6 +222,9 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             String min_h = changeKanji(mTime.minute/10);
 
             mCenter.drawText(canvas, hour_h, hour_l, min_h, min_l);
+            mStatus.drawText(
+                    canvas,
+                    String.format("%4d", mTime.minute > 9 ? mTime.hour*100 + mTime.minute : mTime.hour*10 + mTime.minute)
             );
         }
 

@@ -4,6 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.text.format.Time;
 
 /**
  * Created by nokkii on 2015/05/20.
@@ -34,7 +35,9 @@ public class Status {
         mTextPaint.setAntiAlias(mode);
     }
 
-    public void drawText(Canvas canvas, String text) {
-        canvas.drawText(text, mTextXOffset , mTextYOffset, mTextPaint);
+    public void drawTime(Canvas canvas, Time time) {
+        String text = String.format("%4d",
+                time.minute > 9 ? time.hour * 100 + time.minute : time.hour * 10 + time.minute);
+        canvas.drawText(text, mTextXOffset, mTextYOffset, mTextPaint);
     }
 }

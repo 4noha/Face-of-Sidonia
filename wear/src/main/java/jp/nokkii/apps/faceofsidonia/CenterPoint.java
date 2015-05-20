@@ -3,7 +3,7 @@ package jp.nokkii.apps.faceofsidonia;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Typeface;
+import android.text.format.Time;
 
 /**
  * Created by nokkii on 2015/05/20.
@@ -30,10 +30,48 @@ public class CenterPoint {
         mTextPaint.setAntiAlias(mode);
     }
 
-    public void drawText(Canvas canvas, String text, String text2, String text3, String text4) {
-        canvas.drawText(text , mTextXOffset   , mTextYOffset   , mTextPaint);
-        canvas.drawText(text2, mTextXOffset+91, mTextYOffset   , mTextPaint);
-        canvas.drawText(text3, mTextXOffset   , mTextYOffset+91, mTextPaint);
-        canvas.drawText(text4, mTextXOffset+91, mTextYOffset+91, mTextPaint);
+    public void drawTime(Canvas canvas,Time time) {
+        canvas.drawText(changeKanji(time.hour%10)  , mTextXOffset   , mTextYOffset   , mTextPaint);
+        canvas.drawText(changeKanji(time.hour/10)  , mTextXOffset+91, mTextYOffset   , mTextPaint);
+        canvas.drawText(changeKanji(time.minute%10), mTextXOffset   , mTextYOffset+91, mTextPaint);
+        canvas.drawText(changeKanji(time.minute/10), mTextXOffset+91, mTextYOffset+91, mTextPaint);
+    }
+
+    private String changeKanji(int num) {
+        String c = "";
+
+        switch (num) {
+            case 0:
+                c = "零";
+                break;
+            case 1:
+                c = "壱";
+                break;
+            case 2:
+                c = "弐";
+                break;
+            case 3:
+                c = "参";
+                break;
+            case 4:
+                c = "肆";
+                break;
+            case 5:
+                c = "伍";
+                break;
+            case 6:
+                c = "陸";
+                break;
+            case 7:
+                c = "漆";
+                break;
+            case 8:
+                c = "捌";
+                break;
+            case 9:
+                c = "玖";
+                break;
+        }
+        return c;
     }
 }

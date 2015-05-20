@@ -216,54 +216,9 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
-            String hour_l = changeKanji(mTime.hour%10);
-            String hour_h = changeKanji(mTime.hour/10);
-            String min_l = changeKanji(mTime.minute%10);
-            String min_h = changeKanji(mTime.minute/10);
 
-            mCenter.drawText(canvas, hour_h, hour_l, min_h, min_l);
-            mStatus.drawText(
-                    canvas,
-                    String.format("%4d", mTime.minute > 9 ? mTime.hour*100 + mTime.minute : mTime.hour*10 + mTime.minute)
-            );
-        }
-
-        private String changeKanji(int num) {
-            String c = "";
-
-            switch (num) {
-                case 0:
-                    c = "零";
-                    break;
-                case 1:
-                    c = "壱";
-                    break;
-                case 2:
-                    c = "弐";
-                    break;
-                case 3:
-                    c = "参";
-                    break;
-                case 4:
-                    c = "肆";
-                    break;
-                case 5:
-                    c = "伍";
-                    break;
-                case 6:
-                    c = "陸";
-                    break;
-                case 7:
-                    c = "漆";
-                    break;
-                case 8:
-                    c = "捌";
-                    break;
-                case 9:
-                    c = "玖";
-                    break;
-            }
-            return c;
+            mCenter.drawTime(canvas, mTime);
+            mStatus.drawTime(canvas, mTime);
         }
 
         /**

@@ -65,7 +65,7 @@ public class Status {
         int hour12 = time.hour > 11 ? time.hour - 12 : time.hour;
         String text = String.valueOf(hour12%10) +
                 (time.minute > 9 ? String.valueOf(time.minute) :
-                String.valueOf(0) + String.valueOf(time.minute));
+                        "0" + String.valueOf(time.minute));
 
         canvas.drawText("T", mCenterTextXOffset, mCenterTextYOffset, mCenterTextPaint);
         if (time.hour > 11)
@@ -74,6 +74,17 @@ public class Status {
             canvas.drawText("A", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
         canvas.drawText(text, mRightTextXOffset, mRightTextYOffset, mRightTextPaint);
     }
+
+    public void drawDate(Canvas canvas, Time time) {
+        String text = String.valueOf(time.month%10) +
+                (time.monthDay > 9 ? String.valueOf(time.monthDay) :
+                        "0" + String.valueOf(time.monthDay));
+
+        canvas.drawText("T", mCenterTextXOffset, mCenterTextYOffset, mCenterTextPaint);
+        canvas.drawText("S", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
+        canvas.drawText(text, mRightTextXOffset, mRightTextYOffset, mRightTextPaint);
+    }
+
     public void drawWeekDay(Canvas canvas, Time time) {
         canvas.drawText(changeWeekDayToKanji(time.weekDay),
                 mLeftTextXOffset, mLeftTextYOffset, mLeftTextPaint);

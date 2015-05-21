@@ -90,20 +90,17 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
         };
 
         boolean mRegisteredTimeZoneReceiver = false;
-
-        Status mStatus;
-        CenterPoint mCenter;
-
-        Paint mBackgroundPaint;
         boolean mAmbient;
-
-        Time mTime;
-
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
          */
         boolean mLowBitAmbient;
+
+        Time mTime;
+
+        Status mStatus;
+        CenterPoint mCenter;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -114,14 +111,9 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
                     .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
                     .setShowSystemUiTime(false)
                     .build());
-            Resources resources = FaceOfSidonia.this.getResources();
-
-            mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(resources.getColor(R.color.digital_background));
 
             mCenter = new CenterPoint(FaceOfSidonia.this);
             mStatus = new Status(FaceOfSidonia.this);
-
             mTime = new Time();
         }
 
@@ -172,7 +164,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             super.onApplyWindowInsets(insets);
 
             // Load resources that have alternate values for round watches.
-            Resources resources = FaceOfSidonia.this.getResources();
+            // Resources resources = FaceOfSidonia.this.getResources();
             // boolean isRound = insets.isRound();
         }
 
@@ -208,9 +200,6 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
-            // Draw the background.
-            canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
-
             Resources r = getResources();
             Bitmap bmp = BitmapFactory.decodeResource(r, R.drawable.sidonia);
             canvas.drawBitmap(bmp, 0, 0, null);

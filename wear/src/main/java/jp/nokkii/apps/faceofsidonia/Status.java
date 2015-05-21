@@ -90,6 +90,11 @@ public class Status {
                 mLeftTextXOffset, mLeftTextYOffset, mLeftTextPaint);
     }
 
+    public void drawIsChargeing(Canvas canvas, boolean isCharging) {
+        canvas.drawText(isCharging ? "電" : "無電",
+                mLeftTextXOffset, mLeftTextYOffset, mLeftTextPaint);
+    }
+
     private String changeWeekDayToKanji(int num) {
         String c = "";
 

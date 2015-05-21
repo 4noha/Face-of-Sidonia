@@ -27,12 +27,14 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
@@ -53,9 +55,24 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
      */
     private static final long INTERACTIVE_UPDATE_RATE_MS = TimeUnit.SECONDS.toMillis(1);
 
+    public static final String REQUEST_TYPE = "requestType";
+    public static final int REQUEST_PROCESS = 1;
+    private Engine mEngine;
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // intentがnullで渡される場合もあるのでチェック
+        if (intent != null && intent.getIntExtra(REQUEST_TYPE, 0) == REQUEST_PROCESS) {
+            Log.d("aaaaa", "sssssssss");
+            mEngine.isCharging = !mEngine.isCharging;
+        }
+        return 0;
+    }
+
     @Override
     public Engine onCreateEngine() {
-        return new Engine();
+        mEngine = new Engine();
+        return mEngine;
     }
 
     private class Engine extends CanvasWatchFaceService.Engine {
@@ -101,6 +118,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
         Status mStatus;
         CenterPoint mCenter;
+        boolean isCharging;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -115,6 +133,12 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             mCenter = new CenterPoint(FaceOfSidonia.this);
             mStatus = new Status(FaceOfSidonia.this);
             mTime = new Time();
+
+            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
+            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+            isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                    status == BatteryManager.BATTERY_STATUS_FULL;
         }
 
         @Override
@@ -211,6 +235,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             mStatus.drawWeekDay(canvas, mTime);
             //mStatus.drawTime(canvas, mTime);
             mStatus.drawDate(canvas, mTime);
+            mStatus.drawIsChargeing(canvas, isCharging);
         }
 
         /**

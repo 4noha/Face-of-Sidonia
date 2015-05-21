@@ -10,42 +10,43 @@ import android.text.format.Time;
  * Created by nokkii on 2015/05/20.
  */
 public class Status {
-    Paint mTextPaint;
-    Paint mLeftTextPaint;
+    Paint mRightTextPaint;
+    Paint mCenterTextPaint;
 
-    float mTextXOffset ,mLeftTextXOffset;
-    float mTextYOffset ,mLeftTextYOffset;
+    float mRightTextXOffset ,mCenterTextXOffset;
+    float mRightTextYOffset ,mCenterTextYOffset;
 
     public Status(FaceOfSidonia watch) {
         Resources resources = watch.getResources();
 
-        float textSize = resources.getDimension(R.dimen.status_text_size);
-        float leftTextSize = resources.getDimension(R.dimen.status_text_size) - 33;
+        float textSize = resources.getDimension(R.dimen.status_right_text_size);
+        float leftTextSize = resources.getDimension(R.dimen.status_right_text_size) - 33;
         Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "Browning.ttf");
 
-        // 右側
-        mTextPaint = new Paint();
-        mTextXOffset = resources.getDimension(R.dimen.status_text_x_offset);
-        mTextYOffset = resources.getDimension(R.dimen.status_text_y_offset);
 
-        mTextPaint.setTypeface(typeface);
-        mTextPaint.setColor(resources.getColor(R.color.digital_background));
-        mTextPaint.setTextSize(textSize);
-        mTextPaint.setAntiAlias(true);
+        // 右側
+        mRightTextPaint = new Paint();
+        mRightTextXOffset = resources.getDimension(R.dimen.status_right_text_x_offset);
+        mRightTextYOffset = resources.getDimension(R.dimen.status_right_text_y_offset);
+
+        mRightTextPaint.setTypeface(typeface);
+        mRightTextPaint.setColor(resources.getColor(R.color.digital_background));
+        mRightTextPaint.setTextSize(textSize);
+        mRightTextPaint.setAntiAlias(true);
 
         // 左側
-        mLeftTextPaint = new Paint();
-        mLeftTextXOffset = resources.getDimension(R.dimen.status_text_x_offset) - 21;
-        mLeftTextYOffset = resources.getDimension(R.dimen.status_left_text_y_offset);
+        mCenterTextPaint = new Paint();
+        mCenterTextXOffset = resources.getDimension(R.dimen.status_text_x_offset) - 21;
+        mCenterTextYOffset = resources.getDimension(R.dimen.status_left_text_y_offset);
 
-        mLeftTextPaint.setTypeface(typeface);
-        mLeftTextPaint.setColor(resources.getColor(R.color.digital_background));
-        mLeftTextPaint.setTextSize(leftTextSize);
-        mLeftTextPaint.setAntiAlias(true);
+        mCenterTextPaint.setTypeface(typeface);
+        mCenterTextPaint.setColor(resources.getColor(R.color.digital_background));
+        mCenterTextPaint.setTextSize(leftTextSize);
+        mCenterTextPaint.setAntiAlias(true);
     }
 
     public void setAntiAlias(Boolean mode){
-        mTextPaint.setAntiAlias(mode);
+        mRightTextPaint.setAntiAlias(mode);
     }
 
     public void drawTime(Canvas canvas, Time time) {
@@ -54,11 +55,12 @@ public class Status {
                 (time.minute > 9 ? String.valueOf(time.minute) :
                 String.valueOf(0) + String.valueOf(time.minute));
 
-        canvas.drawText("T", mLeftTextXOffset, mLeftTextYOffset, mLeftTextPaint);
+        canvas.drawText("T", mCenterTextXOffset, mCenterTextYOffset, mCenterTextPaint);
         if (time.hour > 11)
-            canvas.drawText("P", mLeftTextXOffset, mLeftTextYOffset + 27, mLeftTextPaint);
+            canvas.drawText("P", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
         else
-            canvas.drawText("A", mLeftTextXOffset, mLeftTextYOffset + 27, mLeftTextPaint);
-        canvas.drawText(text, mTextXOffset, mTextYOffset, mTextPaint);
+            canvas.drawText("A", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
+        canvas.drawText(text, mRightTextXOffset, mRightTextYOffset, mRightTextPaint);
+    }
     }
 }

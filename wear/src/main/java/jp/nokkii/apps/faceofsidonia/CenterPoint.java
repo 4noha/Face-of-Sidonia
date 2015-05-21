@@ -18,7 +18,7 @@ public class CenterPoint {
     public CenterPoint(FaceOfSidonia watch) {
         Resources resources = watch.getResources();
         float textSize = resources.getDimension(R.dimen.digital_text_size);
-        Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1mn-light.ttf");
+        Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1m-regular.ttf");
 
         mTextPaint = new Paint();
         mTextXOffset = resources.getDimension(R.dimen.digital_x_offset);

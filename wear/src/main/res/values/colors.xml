@@ -2,4 +2,5 @@
 <resources>
     <color name="digital_background">#000000</color>
     <color name="digital_text">#ffff00</color>
+    <color name="round">#00adff</color>
 </resources>

@@ -219,6 +219,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             mTime.setToNow();
 
             mCenter.drawTime(canvas, mTime);
+            mStatus.drawWeekDay(canvas, mTime);
             mStatus.drawTime(canvas, mTime);
         }
 

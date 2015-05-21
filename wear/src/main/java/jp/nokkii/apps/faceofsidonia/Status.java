@@ -10,21 +10,33 @@ import android.text.format.Time;
  * Created by nokkii on 2015/05/20.
  */
 public class Status {
+    Paint mLeftTextPaint;
     Paint mRightTextPaint;
     Paint mCenterTextPaint;
 
-    float mRightTextXOffset ,mCenterTextXOffset;
-    float mRightTextYOffset ,mCenterTextYOffset;
+    float mLeftTextXOffset ,mRightTextXOffset ,mCenterTextXOffset;
+    float mLeftTextYOffset ,mRightTextYOffset ,mCenterTextYOffset;
 
     public Status(FaceOfSidonia watch) {
         Resources resources = watch.getResources();
 
+        float leftTextSize = resources.getDimension(R.dimen.status_left_text_size);
         float textSize = resources.getDimension(R.dimen.status_right_text_size);
-        float leftTextSize = resources.getDimension(R.dimen.status_right_text_size) - 33;
-        Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "Browning.ttf");
+        float centerTextSize = resources.getDimension(R.dimen.status_right_text_size) - 33;
+        Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1m-regular.ttf");
 
+        // 左側
+        mLeftTextPaint = new Paint();
+        mLeftTextXOffset = resources.getDimension(R.dimen.status_left_text_x_offset);
+        mLeftTextYOffset = resources.getDimension(R.dimen.status_left_text_y_offset);
+
+        mLeftTextPaint.setTypeface(typeface);
+        mLeftTextPaint.setColor(resources.getColor(R.color.round));
+        mLeftTextPaint.setTextSize(leftTextSize);
+        mLeftTextPaint.setAntiAlias(true);
 
         // 右側
+        typeface = Typeface.createFromAsset(watch.getAssets(), "Browning.ttf");
         mRightTextPaint = new Paint();
         mRightTextXOffset = resources.getDimension(R.dimen.status_right_text_x_offset);
         mRightTextYOffset = resources.getDimension(R.dimen.status_right_text_y_offset);
@@ -34,14 +46,14 @@ public class Status {
         mRightTextPaint.setTextSize(textSize);
         mRightTextPaint.setAntiAlias(true);
 
-        // 左側
+        // 中央
         mCenterTextPaint = new Paint();
-        mCenterTextXOffset = resources.getDimension(R.dimen.status_text_x_offset) - 21;
-        mCenterTextYOffset = resources.getDimension(R.dimen.status_left_text_y_offset);
+        mCenterTextXOffset = resources.getDimension(R.dimen.status_center_text_x_offset);
+        mCenterTextYOffset = resources.getDimension(R.dimen.status_center_text_y_offset);
 
         mCenterTextPaint.setTypeface(typeface);
         mCenterTextPaint.setColor(resources.getColor(R.color.digital_background));
-        mCenterTextPaint.setTextSize(leftTextSize);
+        mCenterTextPaint.setTextSize(centerTextSize);
         mCenterTextPaint.setAntiAlias(true);
     }
 
@@ -62,5 +74,37 @@ public class Status {
             canvas.drawText("A", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
         canvas.drawText(text, mRightTextXOffset, mRightTextYOffset, mRightTextPaint);
     }
+    public void drawWeekDay(Canvas canvas, Time time) {
+        canvas.drawText(changeWeekDayToKanji(time.weekDay),
+                mLeftTextXOffset, mLeftTextYOffset, mLeftTextPaint);
+    }
+
+    private String changeWeekDayToKanji(int num) {
+        String c = "";
+
+        switch (num) {
+            case 0:
+                c = "曰";
+                break;
+            case 1:
+                c = "月";
+                break;
+            case 2:
+                c = "火";
+                break;
+            case 3:
+                c = "水";
+                break;
+            case 4:
+                c = "木";
+                break;
+            case 5:
+                c = "金";
+                break;
+            case 6:
+                c = "土";
+                break;
+        }
+        return c;
     }
 }

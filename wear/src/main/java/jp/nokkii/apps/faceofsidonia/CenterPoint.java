@@ -31,10 +31,10 @@ public class CenterPoint {
     }
 
     public void drawTime(Canvas canvas,Time time) {
-        canvas.drawText(changeKanji(time.hour%10)  , mTextXOffset   , mTextYOffset   , mTextPaint);
-        canvas.drawText(changeKanji(time.hour/10)  , mTextXOffset+91, mTextYOffset   , mTextPaint);
-        canvas.drawText(changeKanji(time.minute%10), mTextXOffset   , mTextYOffset+91, mTextPaint);
-        canvas.drawText(changeKanji(time.minute/10), mTextXOffset+91, mTextYOffset+91, mTextPaint);
+        canvas.drawText(changeKanji(time.hour/10)  , mTextXOffset   , mTextYOffset   , mTextPaint);
+        canvas.drawText(changeKanji(time.hour%10)  , mTextXOffset+91, mTextYOffset   , mTextPaint);
+        canvas.drawText(changeKanji(time.minute/10), mTextXOffset   , mTextYOffset+91, mTextPaint);
+        canvas.drawText(changeKanji(time.minute%10), mTextXOffset+91, mTextYOffset+91, mTextPaint);
     }
 
     private String changeKanji(int num) {

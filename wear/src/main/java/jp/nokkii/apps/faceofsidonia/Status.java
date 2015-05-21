@@ -37,6 +37,7 @@ public class Status {
         mLeftTextPaint = new Paint();
         mLeftTextXOffset = resources.getDimension(R.dimen.status_text_x_offset) - 21;
         mLeftTextYOffset = resources.getDimension(R.dimen.status_left_text_y_offset);
+
         mLeftTextPaint.setTypeface(typeface);
         mLeftTextPaint.setColor(resources.getColor(R.color.digital_background));
         mLeftTextPaint.setTextSize(leftTextSize);

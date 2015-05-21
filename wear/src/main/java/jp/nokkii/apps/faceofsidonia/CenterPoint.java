@@ -3,6 +3,7 @@ package jp.nokkii.apps.faceofsidonia;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.text.format.Time;
 
 /**
@@ -17,12 +18,14 @@ public class CenterPoint {
     public CenterPoint(FaceOfSidonia watch) {
         Resources resources = watch.getResources();
         float textSize = resources.getDimension(R.dimen.digital_text_size);
+        Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1mn-light.ttf");
 
         mTextPaint = new Paint();
         mTextXOffset = resources.getDimension(R.dimen.digital_x_offset);
         mTextYOffset = resources.getDimension(R.dimen.digital_y_offset);
         mTextPaint = watch.createTextPaint(resources.getColor(R.color.digital_text));
 
+        mTextPaint.setTypeface(typeface);
         mTextPaint.setTextSize(textSize);
     }
 

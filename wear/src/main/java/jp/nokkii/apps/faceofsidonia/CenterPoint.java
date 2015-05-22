@@ -45,34 +45,34 @@ public class CenterPoint {
 
         switch (num) {
             case 0:
-                c = "零";
+                c = "０";
                 break;
             case 1:
-                c = "壱";
+                c = "１";
                 break;
             case 2:
-                c = "弐";
+                c = "２";
                 break;
             case 3:
-                c = "参";
+                c = "３";
                 break;
             case 4:
-                c = "肆";
+                c = "４";
                 break;
             case 5:
-                c = "伍";
+                c = "５";
                 break;
             case 6:
-                c = "陸";
+                c = "６";
                 break;
             case 7:
-                c = "漆";
+                c = "７";
                 break;
             case 8:
-                c = "捌";
+                c = "８";
                 break;
             case 9:
-                c = "玖";
+                c = "９";
                 break;
         }
         return c;

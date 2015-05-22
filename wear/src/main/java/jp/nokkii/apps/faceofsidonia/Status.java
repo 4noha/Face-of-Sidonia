@@ -93,7 +93,7 @@ public class Status {
                 mLeftTextXOffset, mLeftTextYOffset, mLeftTextPaint);
     }
 
-    private String changeWeekDayToKanji(int num) {
+    private static String changeWeekDayToKanji(int num) {
         String c = "";
 
         switch (num) {

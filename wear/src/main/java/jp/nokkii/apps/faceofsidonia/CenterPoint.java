@@ -40,7 +40,7 @@ public class CenterPoint {
         canvas.drawText(changeKanji(time.minute%10), mTextXOffset+91, mTextYOffset+91, mTextPaint);
     }
 
-    private String changeKanji(int num) {
+    private static String changeKanji(int num) {
         String c = "";
 
         switch (num) {

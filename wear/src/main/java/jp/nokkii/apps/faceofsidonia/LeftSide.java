@@ -13,7 +13,7 @@ public class LeftSide {
     Paint mNumTextPaint;
     Paint mTextPaint;
 
-    int mBackgroundColor, mRoundColor;
+    int mBackgroundColor, mRoundColor, mChargingColor;
     float mBlockHeight, mBlockWidth;
     float mTopTextXOffset, mTopTextYOffset;
     float mTopBlockXOffset, mTopBlockYOffset;
@@ -48,6 +48,7 @@ public class LeftSide {
         // 文字用
         mTextPaint = new Paint();
         typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1m-regular.ttf");
+        mChargingColor = resources.getColor(R.color.battery_charge);
 
         mTextPaint.setTypeface(typeface);
         mTextPaint.setColor(mRoundColor);
@@ -64,12 +65,18 @@ public class LeftSide {
         // mNumTextPaint.setAntiAlias(mode);
     }
 
-    public void drawBatteryPct(Canvas canvas, int batteryPct, boolean ambient) {
-        if (ambient) {
+    public void drawBatteryPct(Canvas canvas, int batteryPct, boolean ambient, boolean isCharging) {
+        if ( ambient ) {
             canvas.drawRect(mTopBlockXOffset, mTopBlockYOffset, mTopBlockXOffset + mBlockWidth, mTopBlockYOffset + mBlockHeight, mFillPaint);
             canvas.drawText(String.format("%02d", batteryPct != 100 ? batteryPct : 0), mTopTextXOffset, mTopTextYOffset, mNumTextPaint);
         } else {
-            canvas.drawText("電", mTopTextXOffset - 2, mTopTextYOffset - 4, mTextPaint);
+            if ( isCharging ) {
+                mTextPaint.setColor(mChargingColor);
+                canvas.drawText("電", mTopTextXOffset - 2, mTopTextYOffset - 2, mTextPaint);
+                mTextPaint.setColor(mRoundColor);
+            } else {
+                canvas.drawText("電", mTopTextXOffset - 2, mTopTextYOffset - 2, mTextPaint);
+            }
         }
     }
 }

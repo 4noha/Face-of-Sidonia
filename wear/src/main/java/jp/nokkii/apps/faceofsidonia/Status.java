@@ -58,7 +58,10 @@ public class Status {
     }
 
     public void setAntiAlias(Boolean mode){
-        mRightTextPaint.setAntiAlias(mode);
+        mLeftTextPaint.setAntiAlias(mode);
+        // こっちはめちゃ汚くなる
+        // mCenterTextPaint.setAntiAlias(mode);
+        // mRightTextPaint.setAntiAlias(mode);
     }
 
     public void drawTime(Canvas canvas, Time time) {

@@ -27,6 +27,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -60,6 +61,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
     private class Engine extends CanvasWatchFaceService.Engine {
         static final int MSG_UPDATE_TIME = 0;
+        static final int STATUS_UPDATE_TIME = 10;
 
         /**
          * Handler to update the time periodically in interactive mode.
@@ -77,6 +79,12 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
                             mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
                         }
                         break;
+                }
+
+                if (!mAmbient)
+                    mUpdateWaitCount = mUpdateWaitCount >= STATUS_UPDATE_TIME ? 0 : mUpdateWaitCount + 1;
+                if (mAmbient || !mAmbient && 1 == mUpdateWaitCount){
+                    updateBatteryStatus();
                 }
             }
         };
@@ -97,10 +105,15 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
          */
         boolean mLowBitAmbient;
 
+        int mUpdateWaitCount = 0;
+        boolean isCharging;
+        int mBatteryPct = 0;
+
         Time mTime;
 
         Status mStatus;
         CenterPoint mCenter;
+        LeftSide mLeft;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -114,7 +127,10 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
             mCenter = new CenterPoint(FaceOfSidonia.this);
             mStatus = new Status(FaceOfSidonia.this);
+            mLeft = new LeftSide(FaceOfSidonia.this);
             mTime = new Time();
+
+            updateBatteryStatus();
         }
 
         @Override
@@ -159,6 +175,18 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             FaceOfSidonia.this.unregisterReceiver(mTimeZoneReceiver);
         }
 
+        private void updateBatteryStatus(){
+            IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+            Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
+            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+            mBatteryPct = ( level * 100 ) / scale;
+            isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                    status == BatteryManager.BATTERY_STATUS_FULL;
+        }
+
         @Override
         public void onApplyWindowInsets(WindowInsets insets) {
             super.onApplyWindowInsets(insets);
@@ -185,10 +213,11 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             super.onAmbientModeChanged(inAmbientMode);
             if (mAmbient != inAmbientMode) {
                 mAmbient = inAmbientMode;
+                mUpdateWaitCount = 0;
                 if (mLowBitAmbient) {
                     mCenter.setAntiAlias(!inAmbientMode);
-                    // こっちはめちゃ汚くなる
-                    // mStatus.setAntiAlias(!inAmbientMode);
+                    mStatus.setAntiAlias(!inAmbientMode);
+                    mLeft.setAntiAlias(!inAmbientMode);
                 }
                 invalidate();
             }
@@ -206,11 +235,11 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
-
             mCenter.drawTime(canvas, mTime);
             mStatus.drawWeekDay(canvas, mTime);
             //mStatus.drawTime(canvas, mTime);
             mStatus.drawDate(canvas, mTime);
+            mLeft.drawBatteryPct(canvas, mBatteryPct, mAmbient);
         }
 
         /**

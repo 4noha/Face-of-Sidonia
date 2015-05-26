@@ -37,13 +37,10 @@ import android.text.format.Time;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
+import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
- * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
- */
 public class FaceOfSidonia extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
@@ -104,13 +101,14 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
          * disable anti-aliasing in ambient mode.
          */
         boolean mLowBitAmbient;
+        boolean isCharging = false;
 
         int mUpdateWaitCount = 0;
-        boolean isCharging;
         int mBatteryPct = 0;
 
         Time mTime;
 
+        Background mBackground;
         Status mStatus;
         CenterPoint mCenter;
         LeftSide mLeft;
@@ -128,6 +126,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             mCenter = new CenterPoint(FaceOfSidonia.this);
             mStatus = new Status(FaceOfSidonia.this);
             mLeft = new LeftSide(FaceOfSidonia.this);
+            mBackground = new Background(FaceOfSidonia.this);
             mTime = new Time();
 
             updateBatteryStatus();
@@ -145,7 +144,6 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
             if (visible) {
                 registerReceiver();
-
                 // Update time zone in case it changed while we weren't visible.
                 mTime.clear(TimeZone.getDefault().getID());
                 mTime.setToNow();
@@ -178,9 +176,9 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
         private void updateBatteryStatus(){
             IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
             Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
-            int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-            int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-            int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            int status = batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1) : 0;
+            int level  = batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)  : 0;
+            int scale  = batteryStatus != null ? batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1)  : 0;
 
             mBatteryPct = ( level * 100 ) / scale;
             isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
@@ -215,6 +213,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
                 mAmbient = inAmbientMode;
                 mUpdateWaitCount = 0;
                 if (mLowBitAmbient) {
+                    mBackground.setAntiAlias(!inAmbientMode);
                     mCenter.setAntiAlias(!inAmbientMode);
                     mStatus.setAntiAlias(!inAmbientMode);
                     mLeft.setAntiAlias(!inAmbientMode);
@@ -236,6 +235,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             mTime.setToNow();
             mCenter.drawTime(canvas, mTime);
+            mBackground.drawBackground(canvas);
             mStatus.drawWeekDay(canvas, mTime);
             //mStatus.drawTime(canvas, mTime);
             mStatus.drawDate(canvas, mTime);

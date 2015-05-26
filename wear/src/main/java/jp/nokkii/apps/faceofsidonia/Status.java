@@ -13,9 +13,11 @@ public class Status {
     Paint mLeftTextPaint;
     Paint mRightTextPaint;
     Paint mCenterTextPaint;
+    Paint mFillPaint;
 
     float mLeftTextXOffset ,mRightTextXOffset ,mCenterTextXOffset;
     float mLeftTextYOffset ,mRightTextYOffset ,mCenterTextYOffset;
+    float mRoundBlockWidth;
 
     public Status(FaceOfSidonia watch) {
         Resources resources = watch.getResources();
@@ -24,6 +26,10 @@ public class Status {
         float textSize = resources.getDimension(R.dimen.status_right_text_size);
         float centerTextSize = resources.getDimension(R.dimen.status_right_text_size) - 33;
         Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1m-regular.ttf");
+
+        // 塗りつぶし
+        mFillPaint = watch.createTextPaint(resources.getColor(R.color.round));
+        mRoundBlockWidth = resources.getDimension(R.dimen.round_block_width);
 
         // 左側
         mLeftTextPaint = new Paint();
@@ -58,6 +64,7 @@ public class Status {
     }
 
     public void setAntiAlias(Boolean mode){
+        mFillPaint.setAntiAlias(mode);
         mLeftTextPaint.setAntiAlias(mode);
         // こっちはめちゃ汚くなる
         // mCenterTextPaint.setAntiAlias(mode);
@@ -70,6 +77,7 @@ public class Status {
                 (time.minute > 9 ? String.valueOf(time.minute) :
                         "0" + String.valueOf(time.minute));
 
+        canvas.drawRect(mRoundBlockWidth * 2 +3, 3, mRoundBlockWidth * 4 + 3 + 1.0f, mRoundBlockWidth * 1 + 3 + 1.0f, mFillPaint);
         canvas.drawText("T", mCenterTextXOffset, mCenterTextYOffset, mCenterTextPaint);
         if (time.hour > 11)
             canvas.drawText("P", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
@@ -83,6 +91,7 @@ public class Status {
                 (time.monthDay > 9 ? String.valueOf(time.monthDay) :
                         "0" + String.valueOf(time.monthDay));
 
+        canvas.drawRect(mRoundBlockWidth * 2 +3, 3, mRoundBlockWidth * 4 + 3 + 1.0f, mRoundBlockWidth * 1 + 3 + 1.0f, mFillPaint);
         canvas.drawText("T", mCenterTextXOffset, mCenterTextYOffset, mCenterTextPaint);
         canvas.drawText("S", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
         canvas.drawText(text, mRightTextXOffset, mRightTextYOffset, mRightTextPaint);

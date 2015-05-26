@@ -14,7 +14,7 @@ public class LeftSide {
     Paint mTextPaint;
 
     int mBackgroundColor, mRoundColor, mChargingColor;
-    float mBlockHeight, mBlockWidth;
+    float mBlockWidth;
     float mTopTextXOffset, mTopTextYOffset;
     float mTopBlockXOffset, mTopBlockYOffset;
 
@@ -27,10 +27,9 @@ public class LeftSide {
 
         // 塗りつぶし用
         mFillPaint = new Paint();
-        mBlockHeight = resources.getDimension(R.dimen.side_block_height);
-        mBlockWidth = resources.getDimension(R.dimen.side_block_width);
-        mTopBlockXOffset = resources.getDimension(R.dimen.left_side_top_block_x_offset);
-        mTopBlockYOffset = resources.getDimension(R.dimen.left_side_top_block_y_offset);
+        mBlockWidth = resources.getDimension(R.dimen.round_block_width);
+        mTopBlockXOffset = 3.0f;
+        mTopBlockYOffset = mBlockWidth + 3.0f;
 
         mRoundColor = resources.getColor(R.color.round);
         mFillPaint.setColor(mRoundColor);
@@ -67,15 +66,15 @@ public class LeftSide {
 
     public void drawBatteryPct(Canvas canvas, int batteryPct, boolean ambient, boolean isCharging) {
         if ( ambient ) {
-            canvas.drawRect(mTopBlockXOffset, mTopBlockYOffset, mTopBlockXOffset + mBlockWidth, mTopBlockYOffset + mBlockHeight, mFillPaint);
+            canvas.drawRect(mTopBlockXOffset, mTopBlockYOffset, mTopBlockXOffset + mBlockWidth + 1.0f, mTopBlockYOffset + mBlockWidth + 1.0f, mFillPaint);
             canvas.drawText(String.format("%02d", batteryPct != 100 ? batteryPct : 0), mTopTextXOffset, mTopTextYOffset, mNumTextPaint);
         } else {
             if ( isCharging ) {
                 mTextPaint.setColor(mChargingColor);
-                canvas.drawText("電", mTopTextXOffset - 2, mTopTextYOffset - 2, mTextPaint);
+                canvas.drawText("電", mTopTextXOffset - 2, mTopTextYOffset, mTextPaint);
                 mTextPaint.setColor(mRoundColor);
             } else {
-                canvas.drawText("電", mTopTextXOffset - 2, mTopTextYOffset - 2, mTextPaint);
+                canvas.drawText("電", mTopTextXOffset - 2, mTopTextYOffset, mTextPaint);
             }
         }
     }

@@ -14,10 +14,11 @@ public class Background {
     Paint mBoldLinePaint;
 
     float mRoundBlockWidth;
+    float mLineOffset;
     float mBackGroundLines[];
     float mBackGroundBoldLines[];
 
-    public Background(FaceOfSidonia watch) {
+    public Background(FaceOfSidonia watch, int desiredMinimumWidth) {
         Resources resources = watch.getResources();
 
         // Line
@@ -28,7 +29,8 @@ public class Background {
         mLinePaint = watch.createTextPaint(resources.getColor(R.color.round));
         mLinePaint.setStrokeWidth(1.1f);
 
-        mRoundBlockWidth = resources.getDimension(R.dimen.round_block_width);
+        mLineOffset = desiredMinimumWidth / 80f;
+        mRoundBlockWidth = (desiredMinimumWidth - mLineOffset * 2f) / 5f;
 
         // コンパイラでListから静的なArrayにならないので直書き
         mBackGroundLines = new float[] {

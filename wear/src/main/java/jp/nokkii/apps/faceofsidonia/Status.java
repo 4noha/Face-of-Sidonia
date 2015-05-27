@@ -18,8 +18,9 @@ public class Status {
     float mLeftTextXOffset ,mRightTextXOffset ,mCenterTextXOffset;
     float mLeftTextYOffset ,mRightTextYOffset ,mCenterTextYOffset;
     float mRoundBlockWidth;
+    float mLineOffset;
 
-    public Status(FaceOfSidonia watch) {
+    public Status(FaceOfSidonia watch, int desiredMinimumWidth) {
         Resources resources = watch.getResources();
 
         float leftTextSize = resources.getDimension(R.dimen.status_left_text_size);
@@ -29,7 +30,8 @@ public class Status {
 
         // 塗りつぶし
         mFillPaint = watch.createTextPaint(resources.getColor(R.color.round));
-        mRoundBlockWidth = resources.getDimension(R.dimen.round_block_width);
+        mLineOffset = desiredMinimumWidth / 80f;
+        mRoundBlockWidth = (desiredMinimumWidth - mLineOffset * 2f) / 5f;
 
         // 左側
         mLeftTextPaint = new Paint();

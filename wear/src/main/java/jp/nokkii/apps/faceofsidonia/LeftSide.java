@@ -14,11 +14,11 @@ public class LeftSide {
     Paint mTextPaint;
 
     int mBackgroundColor, mRoundColor, mChargingColor;
-    float mBlockWidth;
+    float mRoundBlockWidth, mLineOffset;
     float mTopTextXOffset, mTopTextYOffset;
     float mTopBlockXOffset, mTopBlockYOffset;
 
-    public LeftSide(FaceOfSidonia watch) {
+    public LeftSide(FaceOfSidonia watch, int desiredMinimumWidth) {
         Resources resources = watch.getResources();
 
         float numTextSize = resources.getDimension(R.dimen.status_left_text_size);
@@ -27,9 +27,10 @@ public class LeftSide {
 
         // 塗りつぶし用
         mFillPaint = new Paint();
-        mBlockWidth = resources.getDimension(R.dimen.round_block_width);
+        mLineOffset = desiredMinimumWidth / 80f;
+        mRoundBlockWidth = (desiredMinimumWidth - mLineOffset * 2f) / 5f;
         mTopBlockXOffset = 3.0f;
-        mTopBlockYOffset = mBlockWidth + 3.0f;
+        mTopBlockYOffset = mRoundBlockWidth + 3.0f;
 
         mRoundColor = resources.getColor(R.color.round);
         mFillPaint.setColor(mRoundColor);
@@ -66,7 +67,7 @@ public class LeftSide {
 
     public void drawBatteryPct(Canvas canvas, int batteryPct, boolean ambient, boolean isCharging) {
         if ( ambient ) {
-            canvas.drawRect(mTopBlockXOffset, mTopBlockYOffset, mTopBlockXOffset + mBlockWidth + 1.0f, mTopBlockYOffset + mBlockWidth + 1.0f, mFillPaint);
+            canvas.drawRect(mTopBlockXOffset, mTopBlockYOffset, mTopBlockXOffset + mRoundBlockWidth + 1.0f, mTopBlockYOffset + mRoundBlockWidth + 1.0f, mFillPaint);
             canvas.drawText(String.format("%02d", batteryPct != 100 ? batteryPct : 0), mTopTextXOffset, mTopTextYOffset, mNumTextPaint);
         } else {
             if ( isCharging ) {

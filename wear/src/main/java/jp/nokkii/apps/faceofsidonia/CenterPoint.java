@@ -15,31 +15,37 @@ public class CenterPoint {
     Paint mTextPaint;
 
     float mTextXOffset, mTextYOffset;
-    float mLineXOffset, mLineYOffset, mWidth, mHeight;
-    float mRoundBlockWidth, mWatchWidth;
+    float mWidth, mHeight;
+    float mRoundBlockWidth, mLineOffset, mWatchWidth;
 
     float mCenterBoldLines[];
+    int mAlertColor;
+    int mRoundColor;
+    int mBackgroundColor;
 
-    public CenterPoint(FaceOfSidonia watch) {
+    public CenterPoint(FaceOfSidonia watch, int desiredMinimumWidth) {
         Resources resources = watch.getResources();
         float textSize = resources.getDimension(R.dimen.digital_text_size);
         Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1m-regular.ttf");
+        mAlertColor = resources.getColor(R.color.alert);
+        mRoundColor = resources.getColor(R.color.round);
+        mBackgroundColor = resources.getColor(R.color.digital_background);
 
         mTextPaint = new Paint();
         mTextXOffset = resources.getDimension(R.dimen.digital_x_offset);
         mTextYOffset = resources.getDimension(R.dimen.digital_y_offset);
-        mTextPaint = watch.createTextPaint(resources.getColor(R.color.alert));
 
         mTextPaint.setTypeface(typeface);
         mTextPaint.setTextSize(textSize);
+        mTextPaint.setColor(mAlertColor);
 
         // Line
         mBoldLinePaint = new Paint();
-        mRoundBlockWidth = resources.getDimension(R.dimen.round_block_width);
-        mWatchWidth = resources.getDimension(R.dimen.watch_width);
+        mLineOffset = desiredMinimumWidth / 80f;
+        mRoundBlockWidth = (desiredMinimumWidth - mLineOffset * 2f) / 5f;
+        mWatchWidth = desiredMinimumWidth;
         mWidth = resources.getDimension(R.dimen.center_width);
         mHeight = resources.getDimension(R.dimen.center_height);
-        mBoldLinePaint = watch.createTextPaint(resources.getColor(R.color.alert));
         mBoldLinePaint.setStrokeWidth(2.0f);
 
         mLinePaint = watch.createTextPaint(resources.getColor(R.color.round));
@@ -60,6 +66,7 @@ public class CenterPoint {
     }
 
     public void drawTime(Canvas canvas, Time time) {
+        mBoldLinePaint.setColor(mAlertColor);
         canvas.drawLine(mRoundBlockWidth * 1 + 4, mWatchWidth / 2.0f, mRoundBlockWidth * 4 + 4, mWatchWidth / 2.0f, mBoldLinePaint);
         canvas.drawLine(mWatchWidth / 2.0f, mRoundBlockWidth * 1 + 4, mWatchWidth / 2.0f, mRoundBlockWidth * 4 + 4, mBoldLinePaint);
         canvas.drawLines(mCenterBoldLines, mBoldLinePaint);

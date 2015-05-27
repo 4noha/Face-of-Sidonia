@@ -26,6 +26,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -107,6 +108,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
         int mBatteryPct = 0;
 
         Time mTime;
+        Bitmap mWallpaper;
 
         Background mBackground;
         Status mStatus;
@@ -123,10 +125,13 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
                     .setShowSystemUiTime(false)
                     .build());
 
-            mCenter = new CenterPoint(FaceOfSidonia.this);
-            mStatus = new Status(FaceOfSidonia.this);
-            mLeft = new LeftSide(FaceOfSidonia.this);
-            mBackground = new Background(FaceOfSidonia.this);
+            Resources r = getResources();
+            mWallpaper = BitmapFactory.decodeResource(r, R.mipmap.sidonia);
+
+            mCenter = new CenterPoint(FaceOfSidonia.this, this.getDesiredMinimumWidth());
+            mStatus = new Status(FaceOfSidonia.this, this.getDesiredMinimumWidth());
+            mLeft = new LeftSide(FaceOfSidonia.this, this.getDesiredMinimumWidth());
+            mBackground = new Background(FaceOfSidonia.this, this.getDesiredMinimumWidth());
             mTime = new Time();
 
             updateBatteryStatus();
@@ -228,11 +233,12 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
-            Resources r = getResources();
-            Bitmap bmp = BitmapFactory.decodeResource(r, R.drawable.sidonia);
-            canvas.drawBitmap(bmp, 0, 0, null);
-
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
+            canvas.drawBitmap(mWallpaper,
+                    new Rect(0, 0, mWallpaper.getWidth(), mWallpaper.getHeight()),
+                    new RectF(0, 0, bounds.width(), bounds.height()),
+                    null
+            );
             mTime.setToNow();
             mCenter.drawTime(canvas, mTime);
             mBackground.drawBackground(canvas);

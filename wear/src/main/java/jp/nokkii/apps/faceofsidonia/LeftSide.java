@@ -59,8 +59,8 @@ public class LeftSide {
         float halfTextWidth = mTextPaint.measureText("電") / 2f;
         Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
         float halfTextHeight = (fontMetrics.ascent + fontMetrics.descent) / 2f;
-        mTopTextPoint = new PointF(mLineOffset + mRoundBlockWidth / 2 - halfTextWidth,
-                mLineOffset + mRoundBlockWidth + mRoundBlockWidth / 2 - halfTextHeight);
+        mTopTextPoint = new PointF(mLineOffset + mRoundBlockWidth / 2f - halfTextWidth,
+                mLineOffset + mRoundBlockWidth + mRoundBlockWidth / 2f - halfTextHeight);
         // Browing 数字2字
         halfTextWidth = mNumTextPaint.measureText("00") / 2f;
         fontMetrics = mTextPaint.getFontMetrics();

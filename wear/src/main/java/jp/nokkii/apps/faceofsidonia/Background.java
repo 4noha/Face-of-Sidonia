@@ -3,8 +3,6 @@ package jp.nokkii.apps.faceofsidonia;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Typeface;
-import android.text.format.Time;
 
 /**
  * Created by nokkii on 2015/05/20.

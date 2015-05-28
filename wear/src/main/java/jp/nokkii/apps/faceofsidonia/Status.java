@@ -3,6 +3,7 @@ package jp.nokkii.apps.faceofsidonia;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.text.format.Time;
 
@@ -14,18 +15,18 @@ public class Status {
     Paint mRightTextPaint;
     Paint mCenterTextPaint;
     Paint mFillPaint;
+    Paint.FontMetrics mCenterFontMetrics;
+    PointF mLeftTextOffset ,mRightTextOffset ,mCenterTextOffset;
 
-    float mLeftTextXOffset ,mRightTextXOffset ,mCenterTextXOffset;
-    float mLeftTextYOffset ,mRightTextYOffset ,mCenterTextYOffset;
     float mRoundBlockWidth;
     float mLineOffset;
 
     public Status(FaceOfSidonia watch, int desiredMinimumWidth) {
         Resources resources = watch.getResources();
 
-        float leftTextSize = resources.getDimension(R.dimen.status_left_text_size);
-        float textSize = resources.getDimension(R.dimen.status_right_text_size);
-        float centerTextSize = resources.getDimension(R.dimen.status_right_text_size) - 33;
+        float leftTextSize   = desiredMinimumWidth /  6.0f;
+        float centerTextSize = desiredMinimumWidth / 12.0f;
+        float textSize       = desiredMinimumWidth /  5.5f;
         Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1m-regular.ttf");
 
         // 塗りつぶし
@@ -35,8 +36,6 @@ public class Status {
 
         // 左側
         mLeftTextPaint = new Paint();
-        mLeftTextXOffset = resources.getDimension(R.dimen.status_left_text_x_offset);
-        mLeftTextYOffset = resources.getDimension(R.dimen.status_left_text_y_offset);
 
         mLeftTextPaint.setTypeface(typeface);
         mLeftTextPaint.setColor(resources.getColor(R.color.round));
@@ -46,8 +45,6 @@ public class Status {
         // 右側
         typeface = Typeface.createFromAsset(watch.getAssets(), "Browning.ttf");
         mRightTextPaint = new Paint();
-        mRightTextXOffset = resources.getDimension(R.dimen.status_right_text_x_offset);
-        mRightTextYOffset = resources.getDimension(R.dimen.status_right_text_y_offset);
 
         mRightTextPaint.setTypeface(typeface);
         mRightTextPaint.setColor(resources.getColor(R.color.digital_background));
@@ -56,13 +53,31 @@ public class Status {
 
         // 中央
         mCenterTextPaint = new Paint();
-        mCenterTextXOffset = resources.getDimension(R.dimen.status_center_text_x_offset);
-        mCenterTextYOffset = resources.getDimension(R.dimen.status_center_text_y_offset);
 
         mCenterTextPaint.setTypeface(typeface);
         mCenterTextPaint.setColor(resources.getColor(R.color.digital_background));
         mCenterTextPaint.setTextSize(centerTextSize);
         mCenterTextPaint.setAntiAlias(true);
+
+        Paint.FontMetrics mFontMetrics = mLeftTextPaint.getFontMetrics();
+        float halfTextWidth  = mLeftTextPaint.measureText("木") / 2f;
+        float halfTextHeight = (mFontMetrics.ascent + mFontMetrics.descent) / 2f;
+        float top            = mLineOffset + mRoundBlockWidth / 2f;
+        float left           = mLineOffset + mRoundBlockWidth + mRoundBlockWidth / 2f;
+        mLeftTextOffset      = new PointF(left - halfTextWidth, top - halfTextHeight);
+
+        mFontMetrics      = mRightTextPaint.getFontMetrics();
+        halfTextWidth     = mRightTextPaint.measureText("000") / 2f;
+        halfTextHeight    = (mFontMetrics.ascent + mFontMetrics.descent) / 2f;
+        left              = mLineOffset + desiredMinimumWidth / 1.60f - halfTextWidth;
+        mRightTextOffset  = new PointF(left, top - halfTextHeight);
+
+        mCenterFontMetrics= mCenterTextPaint.getFontMetrics();
+        halfTextWidth     = mCenterTextPaint.measureText("T") / 2f;
+        halfTextHeight    = (mFontMetrics.ascent + mFontMetrics.descent) / 2f;
+        top               = mLineOffset + mRoundBlockWidth / 8f;
+        left              = mLineOffset + desiredMinimumWidth / 2.25f - halfTextWidth;
+        mCenterTextOffset = new PointF(left, top - halfTextHeight);
     }
 
     public void setAntiAlias(Boolean mode){
@@ -79,13 +94,24 @@ public class Status {
                 (time.minute > 9 ? String.valueOf(time.minute) :
                         "0" + String.valueOf(time.minute));
 
-        canvas.drawRect(mRoundBlockWidth * 2 +3, 3, mRoundBlockWidth * 4 + 3 + 1.0f, mRoundBlockWidth * 1 + 3 + 1.0f, mFillPaint);
-        canvas.drawText("T", mCenterTextXOffset, mCenterTextYOffset, mCenterTextPaint);
+        canvas.drawRect(mRoundBlockWidth * 2 + mLineOffset,
+                mLineOffset,
+                mRoundBlockWidth * 4f + mLineOffset + 1.0f,
+                mRoundBlockWidth * 1f + mLineOffset + 1.0f,
+                mFillPaint
+        );
+        canvas.drawText("T", mCenterTextOffset.x, mCenterTextOffset.y, mCenterTextPaint);
         if (time.hour > 11)
-            canvas.drawText("P", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
+            canvas.drawText("P", mCenterTextOffset.x,
+                    mCenterTextOffset.y + (mLineOffset + mRoundBlockWidth / 3f),
+                    mCenterTextPaint
+            );
         else
-            canvas.drawText("A", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
-        canvas.drawText(text, mRightTextXOffset, mRightTextYOffset, mRightTextPaint);
+            canvas.drawText("A", mCenterTextOffset.x,
+                    mCenterTextOffset.y + (mLineOffset + mRoundBlockWidth / 3f),
+                    mCenterTextPaint
+            );
+        canvas.drawText(text, mRightTextOffset.x, mRightTextOffset.y, mRightTextPaint);
     }
 
     public void drawDate(Canvas canvas, Time time) {
@@ -94,14 +120,17 @@ public class Status {
                         "0" + String.valueOf(time.monthDay));
 
         canvas.drawRect(mRoundBlockWidth * 2 +3, 3, mRoundBlockWidth * 4 + 3 + 1.0f, mRoundBlockWidth * 1 + 3 + 1.0f, mFillPaint);
-        canvas.drawText("T", mCenterTextXOffset, mCenterTextYOffset, mCenterTextPaint);
-        canvas.drawText("S", mCenterTextXOffset, mCenterTextYOffset + 27, mCenterTextPaint);
-        canvas.drawText(text, mRightTextXOffset, mRightTextYOffset, mRightTextPaint);
+        canvas.drawText("T", mCenterTextOffset.x, mCenterTextOffset.y, mCenterTextPaint);
+        canvas.drawText("S", mCenterTextOffset.x,
+                mCenterTextOffset.y + (mLineOffset + mRoundBlockWidth / 3f),
+                mCenterTextPaint
+        );
+        canvas.drawText(text, mRightTextOffset.x, mRightTextOffset.y, mRightTextPaint);
     }
 
     public void drawWeekDay(Canvas canvas, Time time) {
         canvas.drawText(changeWeekDayToKanji(time.weekDay),
-                mLeftTextXOffset, mLeftTextYOffset, mLeftTextPaint);
+                mLeftTextOffset.x, mLeftTextOffset.y, mLeftTextPaint);
     }
 
     private static String changeWeekDayToKanji(int num) {

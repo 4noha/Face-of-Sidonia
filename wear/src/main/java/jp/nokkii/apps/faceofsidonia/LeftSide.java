@@ -21,8 +21,8 @@ public class LeftSide {
     public LeftSide(FaceOfSidonia watch, int desiredMinimumWidth) {
         Resources resources = watch.getResources();
 
-        float numTextSize = resources.getDimension(R.dimen.status_left_text_size);
-        float textSize = resources.getDimension(R.dimen.left_side_text_size);
+        float numTextSize = desiredMinimumWidth / 5.5f;
+        float textSize    = desiredMinimumWidth / 6f;
         Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "Browning.ttf");
 
         // 塗りつぶし用

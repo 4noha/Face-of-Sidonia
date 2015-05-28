@@ -28,6 +28,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,6 +64,11 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
     private class Engine extends CanvasWatchFaceService.Engine {
         static final int MSG_UPDATE_TIME = 0;
         static final int STATUS_UPDATE_TIME = 10;
+        static final boolean SENSING_START = true;
+        static final boolean SENSING_END = false;
+
+        int ANIMATION_DELAY;
+        int STATUS_WAIT_SEC;
 
         /**
          * Handler to update the time periodically in interactive mode.
@@ -79,6 +88,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
                         break;
                 }
 
+                if ( 0 < mStatusTick ) mStatusTick--;
                 if (!mAmbient)
                     mUpdateWaitCount = mUpdateWaitCount >= STATUS_UPDATE_TIME ? 0 : mUpdateWaitCount + 1;
                 if (mAmbient || !mAmbient && 1 == mUpdateWaitCount){
@@ -97,23 +107,23 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
 
         boolean mRegisteredTimeZoneReceiver = false;
         boolean mAmbient;
-        /**
-         * Whether the display supports fewer bits for each color in ambient mode. When true, we
-         * disable anti-aliasing in ambient mode.
-         */
         boolean mLowBitAmbient;
         boolean isCharging = false;
+        boolean isSensing = false;
 
+        int mDrawCenterStatus;
+        int mStatusTick = 0;
         int mUpdateWaitCount = 0;
         int mBatteryPct = 0;
 
         Time mTime;
         Bitmap mWallpaper;
+        private SensorManager mSensorManager;
 
-        Background mBackground;
-        Status mStatus;
+        Background  mBackground;
+        Status      mStatus;
         CenterPoint mCenter;
-        LeftSide mLeft;
+        LeftSide    mLeft;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
@@ -125,21 +135,27 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
                     .setShowSystemUiTime(false)
                     .build());
 
-            Resources r = getResources();
-            mWallpaper = BitmapFactory.decodeResource(r, R.mipmap.sidonia);
+            Resources resources = getResources();
 
-            mCenter = new CenterPoint(FaceOfSidonia.this, this.getDesiredMinimumWidth());
-            mStatus = new Status(FaceOfSidonia.this, this.getDesiredMinimumWidth());
-            mLeft = new LeftSide(FaceOfSidonia.this, this.getDesiredMinimumWidth());
+            ANIMATION_DELAY = resources.getInteger(R.integer.animation_delay);
+            STATUS_WAIT_SEC = resources.getInteger(R.integer.animation_delay);
+            mWallpaper  = BitmapFactory.decodeResource(resources, R.mipmap.sidonia);
+
+            mCenter     = new CenterPoint(FaceOfSidonia.this, this.getDesiredMinimumWidth());
+            mStatus     = new Status(FaceOfSidonia.this, this.getDesiredMinimumWidth());
+            mLeft       = new LeftSide(FaceOfSidonia.this, this.getDesiredMinimumWidth());
             mBackground = new Background(FaceOfSidonia.this, this.getDesiredMinimumWidth());
-            mTime = new Time();
+            mTime       = new Time();
 
+            mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+            SensorListenerSwitch(SENSING_START);
             updateBatteryStatus();
         }
 
         @Override
         public void onDestroy() {
             mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            SensorListenerSwitch(SENSING_END);
             super.onDestroy();
         }
 
@@ -155,7 +171,6 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             } else {
                 unregisterReceiver();
             }
-
             // Whether the timer should be running depends on whether we're visible (as well as
             // whether we're in ambient mode), so we may need to start or stop the timer.
             updateTimer();
@@ -178,6 +193,23 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             FaceOfSidonia.this.unregisterReceiver(mTimeZoneReceiver);
         }
 
+        private void SensorListenerSwitch(boolean on){
+            mDrawCenterStatus = -STATUS_WAIT_SEC;
+            if ( on ){
+                if ( isSensing ) return;
+                List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
+                if(sensors.size() > 0) {
+                    Sensor s = sensors.get(0);
+                    mSensorManager.registerListener(mSensorEventListener, s, SensorManager.SENSOR_DELAY_UI);
+                }
+                isSensing = true;
+            } else {
+                if ( !isSensing ) return;
+                isSensing = false;
+                mSensorManager.unregisterListener(mSensorEventListener);
+            }
+        }
+
         private void updateBatteryStatus(){
             IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
             Intent batteryStatus = getApplicationContext().registerReceiver(null, ifilter);
@@ -193,7 +225,6 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
         @Override
         public void onApplyWindowInsets(WindowInsets insets) {
             super.onApplyWindowInsets(insets);
-
             // Load resources that have alternate values for round watches.
             // Resources resources = FaceOfSidonia.this.getResources();
             // boolean isRound = insets.isRound();
@@ -217,11 +248,17 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             if (mAmbient != inAmbientMode) {
                 mAmbient = inAmbientMode;
                 mUpdateWaitCount = 0;
+                mStatusTick = 0;
                 if (mLowBitAmbient) {
                     mBackground.setAntiAlias(!inAmbientMode);
                     mCenter.setAntiAlias(!inAmbientMode);
                     mStatus.setAntiAlias(!inAmbientMode);
                     mLeft.setAntiAlias(!inAmbientMode);
+                }
+                if (mAmbient)
+                    SensorListenerSwitch(SENSING_END);
+                else {
+                    SensorListenerSwitch(SENSING_START);
                 }
                 invalidate();
             }
@@ -234,18 +271,39 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
-            canvas.drawBitmap(mWallpaper,
-                    new Rect(0, 0, mWallpaper.getWidth(), mWallpaper.getHeight()),
-                    new RectF(0, 0, bounds.width(), bounds.height()),
-                    null
-            );
-            mTime.setToNow();
-            mCenter.drawTime(canvas, mTime);
-            mBackground.drawBackground(canvas);
-            mStatus.drawWeekDay(canvas, mTime);
-            //mStatus.drawTime(canvas, mTime);
-            mStatus.drawDate(canvas, mTime);
-            mLeft.drawBatteryPct(canvas, mBatteryPct, mAmbient, isCharging);
+            //canvas.drawBitmap(mWallpaper, 0, 0, null);
+            //if ( 1 > mDrawCenterStatus ) {
+                canvas.drawBitmap(mWallpaper,
+                        new Rect(0, 0, mWallpaper.getWidth(), mWallpaper.getHeight()),
+                        new RectF(0, 0, bounds.width(), bounds.height()),
+                        null
+                );
+                mTime.setToNow();
+                mBackground.drawBackground(canvas);
+                mStatus.drawWeekDay(canvas, mTime);
+                //mStatus.drawTime(canvas, mTime);
+                mStatus.drawDate(canvas, mTime);
+                mCenter.drawTime(canvas, mTime);
+                mLeft.drawBatteryPct(canvas, mBatteryPct, mAmbient, isCharging);
+            //}
+            if ( -STATUS_WAIT_SEC < mDrawCenterStatus ) {
+                if ( mCenter.drawStatus(canvas, mDrawCenterStatus, mBatteryPct) ) {
+                    mDrawCenterStatus--;
+                    sleep(ANIMATION_DELAY);
+                    invalidate();
+                    updateTimer();
+                } else {
+                    mDrawCenterStatus--;
+                }
+            }
+        }
+
+        public synchronized void sleep(long msec)
+        {
+            try
+            {
+                wait(msec);
+            }catch(InterruptedException e){}
         }
 
         /**
@@ -266,6 +324,36 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
         private boolean shouldTimerBeRunning() {
             return isVisible() && !isInAmbientMode();
         }
+
+        private final SensorEventListener mSensorEventListener =
+                new SensorEventListener() {
+                    // ローパスフィルタ用変数
+                    private float lowX;
+                    // private float lowY;
+                    // private float lowZ;
+
+                    private static final float FILTERING_VALUE = 0.2f;
+                    private static final float SLIDE_IN_X = -5.5f;
+
+                    @Override
+                    public void onSensorChanged(SensorEvent event) {
+                        lowX = getLowPassFilterValue(event.values[0], lowX);
+                        // lowY = getLowPassFilterValue(event.values[1], lowY);
+                        // lowZ = getLowPassFilterValue(event.values[2], lowZ);
+
+                        if ( lowX < SLIDE_IN_X && mDrawCenterStatus < 0)
+                            mDrawCenterStatus = mDrawCenterStatus <= -STATUS_WAIT_SEC ? 4 : 0;
+                    }
+
+                    float getLowPassFilterValue(float eventValue, float lowValue) {
+                        return eventValue * FILTERING_VALUE + lowValue
+                                * (1.0f - FILTERING_VALUE);
+                    }
+
+                    @Override
+                    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+                    }
+                };
     }
 
     public Paint createTextPaint(int textColor) {

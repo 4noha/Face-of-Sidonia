@@ -3,6 +3,7 @@ package jp.nokkii.apps.faceofsidonia;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.graphics.Typeface;
 import android.text.format.Time;
 
@@ -13,11 +14,10 @@ public class CenterPoint {
     Paint mLinePaint;
     Paint mBoldLinePaint;
     Paint mTextPaint;
+    Paint.FontMetrics mFontMetrics;
+    PointF mTLTextPoint, mTRTextPoint, mBLTextPoint, mBRTextPoint;
 
-    float mTextXOffset, mTextYOffset;
-    float mWidth, mHeight;
-    float mRoundBlockWidth, mLineOffset, mWatchWidth;
-
+    float mRoundBlockWidth, mCenterBlockWidth, mLineOffset, mWatchWidth;
     float mCenterBoldLines[];
     int mAlertColor;
     int mRoundColor;
@@ -25,39 +25,50 @@ public class CenterPoint {
 
     public CenterPoint(FaceOfSidonia watch, int desiredMinimumWidth) {
         Resources resources = watch.getResources();
-        float textSize = resources.getDimension(R.dimen.digital_text_size);
+        float textSize = desiredMinimumWidth / 5f;
         Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1m-regular.ttf");
         mAlertColor = resources.getColor(R.color.alert);
         mRoundColor = resources.getColor(R.color.round);
         mBackgroundColor = resources.getColor(R.color.digital_background);
 
-        mTextPaint = new Paint();
-        mTextXOffset = resources.getDimension(R.dimen.digital_x_offset);
-        mTextYOffset = resources.getDimension(R.dimen.digital_y_offset);
-
-        mTextPaint.setTypeface(typeface);
-        mTextPaint.setTextSize(textSize);
-        mTextPaint.setColor(mAlertColor);
-
-        // Line
-        mBoldLinePaint = new Paint();
         mLineOffset = desiredMinimumWidth / 80f;
         mRoundBlockWidth = (desiredMinimumWidth - mLineOffset * 2f) / 5f;
         mWatchWidth = desiredMinimumWidth;
-        mWidth = resources.getDimension(R.dimen.center_width);
-        mHeight = resources.getDimension(R.dimen.center_height);
-        mBoldLinePaint.setStrokeWidth(2.0f);
+        mCenterBlockWidth = ( desiredMinimumWidth - (mLineOffset * 2f + mRoundBlockWidth * 2f) ) / 2f;
+
+        mTextPaint = new Paint();
+
+        mTextPaint.setTypeface(typeface);
+        mTextPaint.setTextSize(textSize);
+        mFontMetrics = mTextPaint.getFontMetrics();
+        mTextPaint.setColor(mAlertColor);
+
+        float halfTextWidth = mTextPaint.measureText("０") / 2f;
+        float halfTextHeight = (mFontMetrics.ascent + mFontMetrics.descent) / 2f;
+        float top = mLineOffset + mRoundBlockWidth + mCenterBlockWidth / 2f;
+        mTLTextPoint = new PointF(top - halfTextWidth, top - halfTextHeight);
+        mTRTextPoint = new PointF(top + mCenterBlockWidth - halfTextWidth, top - halfTextHeight);
+        mBLTextPoint = new PointF(top - halfTextWidth, top + mCenterBlockWidth - halfTextHeight);
+        mBRTextPoint = new PointF(top + mCenterBlockWidth - halfTextWidth, top + mCenterBlockWidth - halfTextHeight);
+
+        // Line
+        mBoldLinePaint = new Paint();
+        mBoldLinePaint.setStrokeWidth(mLineOffset / 2f);
 
         mLinePaint = watch.createTextPaint(resources.getColor(R.color.round));
-        mLinePaint.setStrokeWidth(1.0f);
+        mLinePaint.setStrokeWidth(mLineOffset / 4f);
+
+        mFillPaint = new Paint();
+        mFillPaint.setColor(mBackgroundColor);
+        mFillPaint.setAntiAlias(true);
 
         mCenterBoldLines = new float[] {
                 // 縦線
-                mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 4 + 4,
-                mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 4 + 4,
+                mRoundBlockWidth * 1f + mLineOffset, mRoundBlockWidth * 1f + mLineOffset, mRoundBlockWidth * 1f + mLineOffset, mRoundBlockWidth * 4f + mLineOffset,
+                mRoundBlockWidth * 4f + mLineOffset, mRoundBlockWidth * 1f + mLineOffset, mRoundBlockWidth * 4f + mLineOffset, mRoundBlockWidth * 4f + mLineOffset,
                 // 横線
-                mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 1 + 4,
-                mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 4 + 4,
+                mRoundBlockWidth * 1f + mLineOffset, mRoundBlockWidth * 1f + mLineOffset, mRoundBlockWidth * 4f + mLineOffset, mRoundBlockWidth * 1f + mLineOffset,
+                mRoundBlockWidth * 1f + mLineOffset, mRoundBlockWidth * 4f + mLineOffset, mRoundBlockWidth * 4f + mLineOffset, mRoundBlockWidth * 4f + mLineOffset,
         };
     }
 
@@ -67,14 +78,13 @@ public class CenterPoint {
 
     public void drawTime(Canvas canvas, Time time) {
         mBoldLinePaint.setColor(mAlertColor);
-        canvas.drawLine(mRoundBlockWidth * 1 + 4, mWatchWidth / 2.0f, mRoundBlockWidth * 4 + 4, mWatchWidth / 2.0f, mBoldLinePaint);
-        canvas.drawLine(mWatchWidth / 2.0f, mRoundBlockWidth * 1 + 4, mWatchWidth / 2.0f, mRoundBlockWidth * 4 + 4, mBoldLinePaint);
+        canvas.drawLine(mRoundBlockWidth * 1f + mLineOffset, mWatchWidth / 2f, mRoundBlockWidth * 4f + mLineOffset, mWatchWidth / 2f, mBoldLinePaint);
+        canvas.drawLine(mWatchWidth / 2f, mRoundBlockWidth * 1f + mLineOffset, mWatchWidth / 2f, mRoundBlockWidth * 4f + mLineOffset, mBoldLinePaint);
         canvas.drawLines(mCenterBoldLines, mBoldLinePaint);
-
-        canvas.drawText(changeKanji(time.hour / 10), mTextXOffset, mTextYOffset, mTextPaint);
-        canvas.drawText(changeKanji(time.hour % 10), mTextXOffset + 91, mTextYOffset, mTextPaint);
-        canvas.drawText(changeKanji(time.minute / 10), mTextXOffset, mTextYOffset + 91, mTextPaint);
-        canvas.drawText(changeKanji(time.minute % 10), mTextXOffset + 91, mTextYOffset + 91, mTextPaint);
+        canvas.drawText(changeKanji(time.hour / 10)  , mTLTextPoint.x, mTLTextPoint.y, mTextPaint);
+        canvas.drawText(changeKanji(time.hour % 10)  , mTRTextPoint.x, mTRTextPoint.y, mTextPaint);
+        canvas.drawText(changeKanji(time.minute / 10), mBLTextPoint.x, mBLTextPoint.y, mTextPaint);
+        canvas.drawText(changeKanji(time.minute % 10), mBRTextPoint.x, mBRTextPoint.y, mTextPaint);
     }
 
     }

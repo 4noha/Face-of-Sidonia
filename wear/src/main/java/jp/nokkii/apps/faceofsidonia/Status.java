@@ -24,7 +24,7 @@ public class Status {
     public Status(FaceOfSidonia watch, int desiredMinimumWidth) {
         Resources resources = watch.getResources();
 
-        float leftTextSize   = desiredMinimumWidth /  6.0f;
+        float leftTextSize   = desiredMinimumWidth /  5.5f;
         float centerTextSize = desiredMinimumWidth / 12.0f;
         float textSize       = desiredMinimumWidth /  5.5f;
         Typeface typeface = Typeface.createFromAsset(watch.getAssets(), "mplus-1m-regular.ttf");
@@ -75,7 +75,7 @@ public class Status {
         mCenterFontMetrics= mCenterTextPaint.getFontMetrics();
         halfTextWidth     = mCenterTextPaint.measureText("T") / 2f;
         halfTextHeight    = (mFontMetrics.ascent + mFontMetrics.descent) / 2f;
-        top               = mLineOffset + mRoundBlockWidth / 8f;
+        top               = mLineOffset + mRoundBlockWidth / 9f;
         left              = mLineOffset + desiredMinimumWidth / 2.25f - halfTextWidth;
         mCenterTextOffset = new PointF(left, top - halfTextHeight);
     }
@@ -94,10 +94,10 @@ public class Status {
                 (time.minute > 9 ? String.valueOf(time.minute) :
                         "0" + String.valueOf(time.minute));
 
-        canvas.drawRect(mRoundBlockWidth * 2 + mLineOffset,
+        canvas.drawRect(mRoundBlockWidth * 2f + mLineOffset,
                 mLineOffset,
-                mRoundBlockWidth * 4f + mLineOffset + 1.0f,
-                mRoundBlockWidth * 1f + mLineOffset + 1.0f,
+                mRoundBlockWidth * 4f + mLineOffset,
+                mRoundBlockWidth * 1f + mLineOffset,
                 mFillPaint
         );
         canvas.drawText("T", mCenterTextOffset.x, mCenterTextOffset.y, mCenterTextPaint);
@@ -119,7 +119,11 @@ public class Status {
                 (time.monthDay > 9 ? String.valueOf(time.monthDay) :
                         "0" + String.valueOf(time.monthDay));
 
-        canvas.drawRect(mRoundBlockWidth * 2 +3, 3, mRoundBlockWidth * 4 + 3 + 1.0f, mRoundBlockWidth * 1 + 3 + 1.0f, mFillPaint);
+        canvas.drawRect(mRoundBlockWidth * 2f + mLineOffset, mLineOffset,
+                mRoundBlockWidth * 4f + mLineOffset,
+                mRoundBlockWidth * 1f + mLineOffset,
+                mFillPaint
+        );
         canvas.drawText("T", mCenterTextOffset.x, mCenterTextOffset.y, mCenterTextPaint);
         canvas.drawText("S", mCenterTextOffset.x,
                 mCenterTextOffset.y + (mLineOffset + mRoundBlockWidth / 3f),

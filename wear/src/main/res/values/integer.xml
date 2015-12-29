@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="animation_delay">10</integer>
-    <integer name="status_wait_sec">5</integer>
+    <integer name="status_wait_sec">3</integer>
 </resources>

@@ -4,7 +4,9 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
-
+    lintOptions {
+        abortOnError false
+    }
     defaultConfig {
         applicationId "jp.nokkii.apps.faceofsidonia"
         minSdkVersion 21

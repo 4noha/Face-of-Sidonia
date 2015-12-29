@@ -138,7 +138,7 @@ public class FaceOfSidonia extends CanvasWatchFaceService {
             Resources resources = getResources();
 
             ANIMATION_DELAY = resources.getInteger(R.integer.animation_delay);
-            STATUS_WAIT_SEC = resources.getInteger(R.integer.animation_delay);
+            STATUS_WAIT_SEC = resources.getInteger(R.integer.status_wait_sec);
             mWallpaper  = BitmapFactory.decodeResource(resources, R.mipmap.sidonia);
 
             mCenter     = new CenterPoint(FaceOfSidonia.this, this.getDesiredMinimumWidth());

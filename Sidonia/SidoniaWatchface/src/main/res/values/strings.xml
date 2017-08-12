@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Sidonia</string>
+    <string name="message">Watch face tapped</string>
+    <string name="my_digital_name">Sidonia Watchface</string>
+    <string name="kanji_font">mplus-1m-regular.ttf</string>
+    <string name="latin_font">Hallandale Stencil Bold JL.ttf</string>
+</resources>

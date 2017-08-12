@@ -1,79 +1,48 @@
 package moe.chyyran.sidonia.Drawables
 
 
-import android.app.WallpaperManager
 import android.graphics.Canvas
-import android.graphics.Paint
-import android.support.v4.content.ContextCompat
 
 import com.ustwo.clockwise.WatchFace
 
-import moe.chyyran.sidonia.R
+class GridDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
 
-class GridDrawable(watch: WatchFace) {
-    internal var mLinePaint: Paint
-    internal var mBoldLinePaint: Paint
+    private var mBackgroundLines: FloatArray = floatArrayOf(
+            // Vertical Lines
+            hudCellWidth * 0 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 2 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 2 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 2 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 2 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 3 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 3 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 3 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 3 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 4 + edgeOffset,
+            // Horizontal Lines
+            hudCellWidth * 1 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 2 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 2 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 2 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 2 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 3 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 3 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 3 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 3 + edgeOffset, hudCellWidth * 0 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 5 + edgeOffset)
 
-    internal var mRoundBlockWidth: Float = 0.toFloat()
-    internal var mLineOffset: Float = 0.toFloat()
-    internal var mBackGroundLines: FloatArray
-    internal var mBackGroundBoldLines: FloatArray
-
-    init {
-        val backgroundColor = ContextCompat.getColor(watch.applicationContext, R.color.round)
-        val desiredMinimumWidth = WallpaperManager.getInstance(watch).desiredMinimumWidth
-        // Line
-        mBoldLinePaint = createTextPaint(backgroundColor)
-        mBoldLinePaint.strokeWidth = 2.0f
-
-        mLinePaint = createTextPaint(backgroundColor)
-        mLinePaint.strokeWidth = 1.1f
-
-        mLineOffset = desiredMinimumWidth / 80f
-        mRoundBlockWidth = (desiredMinimumWidth - mLineOffset * 2f) / 5f
-
-        // コンパイラでListから静的なArrayにならないので直書き
-        mBackGroundLines = floatArrayOf(
-                // 縦線
-                mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 4 + 4,
-                // 横線
-                mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 5 + 4)
-
-        mBackGroundBoldLines = floatArrayOf(
-                // 縦棒
-                mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 1 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 1 + 8, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 1 + 3, // 内側
-                mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 1 + 3, // 内側
-                mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 1 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 1 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 2, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 2 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 2, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 2 + 8,
-                // mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 2, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 2 + 8,
-                // mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 2, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 2 + 8,
-                mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 2, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 2 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 2, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 2 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 3, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 3 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 3, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 3 + 8,
-                // mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 3, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 3 + 8,
-                // mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 3, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 3 + 8,
-                mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 3, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 3 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 3, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 3 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 4 + 5, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 4 + 8, // 内側
-                mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 4 + 5, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 4 + 8, // 内側
-                mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 5 + 8,
-                // 横棒
-                mRoundBlockWidth * 0, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 0, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 0 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 1 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 1 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 1 + 3, mRoundBlockWidth * 2 + 4, // 内側
-                mRoundBlockWidth * 1, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 1 + 3, mRoundBlockWidth * 3 + 4, // 内側
-                mRoundBlockWidth * 1, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 1 + 8, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 1, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 1 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 2, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 2 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 2, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 2 + 8, mRoundBlockWidth * 1 + 4,
-                // mRoundBlockWidth * 2, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 2 + 8, mRoundBlockWidth * 2 + 4,
-                // mRoundBlockWidth * 2, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 2 + 8, mRoundBlockWidth * 3 + 4,
-                mRoundBlockWidth * 2, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 2 + 8, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 2, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 2 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 3, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 3 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 3, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 3 + 8, mRoundBlockWidth * 1 + 4,
-                // mRoundBlockWidth * 3, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 3 + 8, mRoundBlockWidth * 2 + 4,
-                // mRoundBlockWidth * 3, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 3 + 8, mRoundBlockWidth * 3 + 4,
-                mRoundBlockWidth * 3, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 3 + 8, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 3, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 3 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 4, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 4, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 2 + 5, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 2 + 4, // 内側
-                mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 3 + 5, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 3 + 4, // 内側
-                mRoundBlockWidth * 4, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 4, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 4 + 8, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 0 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 1 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 2 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 3 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 4 + 4, mRoundBlockWidth * 5, mRoundBlockWidth * 5 + 4, mRoundBlockWidth * 5 + 8, mRoundBlockWidth * 5 + 4)
-    }
-
-    fun setAntiAlias(mode: Boolean?) {
-        mLinePaint.isAntiAlias = mode!!
-    }
+    private var mBackgroundCrosshairs: FloatArray = floatArrayOf(
+            // 縦棒
+            hudCellWidth * 0 + edgeOffset, hudCellWidth * 0, hudCellWidth * 0 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 0, hudCellWidth * 1 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 2 + edgeOffset, hudCellWidth * 0, hudCellWidth * 2 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 3 + edgeOffset, hudCellWidth * 0, hudCellWidth * 3 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 0, hudCellWidth * 4 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 0, hudCellWidth * 5 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 1, hudCellWidth * 0 + edgeOffset, hudCellWidth * 1 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 1, hudCellWidth * 1 + edgeOffset, hudCellWidth * 1 + 8, hudCellWidth * 2 + edgeOffset, hudCellWidth * 1, hudCellWidth * 2 + edgeOffset, hudCellWidth * 1 + 3, // 内側
+            hudCellWidth * 3 + edgeOffset, hudCellWidth * 1, hudCellWidth * 3 + edgeOffset, hudCellWidth * 1 + 3, // 内側
+            hudCellWidth * 4 + edgeOffset, hudCellWidth * 1, hudCellWidth * 4 + edgeOffset, hudCellWidth * 1 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 1, hudCellWidth * 5 + edgeOffset, hudCellWidth * 1 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 2, hudCellWidth * 0 + edgeOffset, hudCellWidth * 2 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 2, hudCellWidth * 1 + edgeOffset, hudCellWidth * 2 + 8,
+            // hudCellWidth * 2 + edgeOffset, hudCellWidth * 2, hudCellWidth * 2 + edgeOffset, hudCellWidth * 2 + 8,
+            // hudCellWidth * 3 + edgeOffset, hudCellWidth * 2, hudCellWidth * 3 + edgeOffset, hudCellWidth * 2 + 8,
+            hudCellWidth * 4 + edgeOffset, hudCellWidth * 2, hudCellWidth * 4 + edgeOffset, hudCellWidth * 2 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 2, hudCellWidth * 5 + edgeOffset, hudCellWidth * 2 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 3, hudCellWidth * 0 + edgeOffset, hudCellWidth * 3 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 3, hudCellWidth * 1 + edgeOffset, hudCellWidth * 3 + 8,
+            // hudCellWidth * 2 + edgeOffset, hudCellWidth * 3, hudCellWidth * 2 + edgeOffset, hudCellWidth * 3 + 8,
+            // hudCellWidth * 3 + edgeOffset, hudCellWidth * 3, hudCellWidth * 3 + edgeOffset, hudCellWidth * 3 + 8,
+            hudCellWidth * 4 + edgeOffset, hudCellWidth * 3, hudCellWidth * 4 + edgeOffset, hudCellWidth * 3 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 3, hudCellWidth * 5 + edgeOffset, hudCellWidth * 3 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 4, hudCellWidth * 0 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 4, hudCellWidth * 1 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 2 + edgeOffset, hudCellWidth * 4 + 5, hudCellWidth * 2 + edgeOffset, hudCellWidth * 4 + 8, // 内側
+            hudCellWidth * 3 + edgeOffset, hudCellWidth * 4 + 5, hudCellWidth * 3 + edgeOffset, hudCellWidth * 4 + 8, // 内側
+            hudCellWidth * 4 + edgeOffset, hudCellWidth * 4, hudCellWidth * 4 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 4, hudCellWidth * 5 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 5, hudCellWidth * 0 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 2 + edgeOffset, hudCellWidth * 5, hudCellWidth * 2 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 3 + edgeOffset, hudCellWidth * 5, hudCellWidth * 3 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 5, hudCellWidth * 4 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 5, hudCellWidth * 5 + edgeOffset, hudCellWidth * 5 + 8,
+            // 横棒
+            hudCellWidth * 0, hudCellWidth * 0 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 0, hudCellWidth * 1 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 0, hudCellWidth * 2 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 2 + edgeOffset, hudCellWidth * 0, hudCellWidth * 3 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 3 + edgeOffset, hudCellWidth * 0, hudCellWidth * 4 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 0, hudCellWidth * 5 + edgeOffset, hudCellWidth * 0 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 1, hudCellWidth * 0 + edgeOffset, hudCellWidth * 1 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 1, hudCellWidth * 1 + edgeOffset, hudCellWidth * 1 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 1, hudCellWidth * 2 + edgeOffset, hudCellWidth * 1 + 3, hudCellWidth * 2 + edgeOffset, // 内側
+            hudCellWidth * 1, hudCellWidth * 3 + edgeOffset, hudCellWidth * 1 + 3, hudCellWidth * 3 + edgeOffset, // 内側
+            hudCellWidth * 1, hudCellWidth * 4 + edgeOffset, hudCellWidth * 1 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 1, hudCellWidth * 5 + edgeOffset, hudCellWidth * 1 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 2, hudCellWidth * 0 + edgeOffset, hudCellWidth * 2 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 2, hudCellWidth * 1 + edgeOffset, hudCellWidth * 2 + 8, hudCellWidth * 1 + edgeOffset,
+            // hudCellWidth * 2, hudCellWidth * 2 + edgeOffset, hudCellWidth * 2 + 8, hudCellWidth * 2 + edgeOffset,
+            // hudCellWidth * 2, hudCellWidth * 3 + edgeOffset, hudCellWidth * 2 + 8, hudCellWidth * 3 + edgeOffset,
+            hudCellWidth * 2, hudCellWidth * 4 + edgeOffset, hudCellWidth * 2 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 2, hudCellWidth * 5 + edgeOffset, hudCellWidth * 2 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 3, hudCellWidth * 0 + edgeOffset, hudCellWidth * 3 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 3, hudCellWidth * 1 + edgeOffset, hudCellWidth * 3 + 8, hudCellWidth * 1 + edgeOffset,
+            // hudCellWidth * 3, hudCellWidth * 2 + edgeOffset, hudCellWidth * 3 + 8, hudCellWidth * 2 + edgeOffset,
+            // hudCellWidth * 3, hudCellWidth * 3 + edgeOffset, hudCellWidth * 3 + 8, hudCellWidth * 3 + edgeOffset,
+            hudCellWidth * 3, hudCellWidth * 4 + edgeOffset, hudCellWidth * 3 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 3, hudCellWidth * 5 + edgeOffset, hudCellWidth * 3 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 4, hudCellWidth * 0 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 4, hudCellWidth * 1 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 4 + edgeOffset, hudCellWidth * 2 + 5, hudCellWidth * 4 + 8, hudCellWidth * 2 + edgeOffset, // 内側
+            hudCellWidth * 4 + edgeOffset, hudCellWidth * 3 + 5, hudCellWidth * 4 + 8, hudCellWidth * 3 + edgeOffset, // 内側
+            hudCellWidth * 4, hudCellWidth * 4 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 4, hudCellWidth * 5 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 5, hudCellWidth * 0 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 5, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5, hudCellWidth * 2 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 2 + edgeOffset, hudCellWidth * 5, hudCellWidth * 3 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 3 + edgeOffset, hudCellWidth * 5, hudCellWidth * 4 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 5, hudCellWidth * 5 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 5 + edgeOffset)
 
     fun drawBackground(canvas: Canvas?) {
         canvas?.save()
-        canvas?.drawLines(mBackGroundLines, mLinePaint)
-        canvas?.drawLines(mBackGroundBoldLines, mBoldLinePaint)
+        canvas?.drawLines(mBackgroundLines, this.hudPaint)
+        canvas?.drawLines(mBackgroundCrosshairs, this.hudBoldPaint)
         canvas?.restore()
     }
 }

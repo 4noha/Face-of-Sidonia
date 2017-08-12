@@ -1,125 +1,110 @@
 package moe.chyyran.sidonia.Drawables
 
-import android.app.WallpaperManager
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.PointF
-import android.graphics.Typeface
+import android.graphics.*
 import android.text.format.Time
 
 import com.ustwo.clockwise.WatchFace
+import com.ustwo.clockwise.WatchFaceTime
 
-import moe.chyyran.sidonia.R
+private class TextOffsets(val leftTextOffset: PointF, val rightTextOffset: PointF, val halfHeightTextOffset: PointF)
 
-/**
- * Created by nokkii on 2015/05/20.
- */
-class StatusDrawable(watch: WatchFace) {
-    internal var mLeftTextPaint: Paint
-    internal var mRightTextPaint: Paint
-    internal var mCenterTextPaint: Paint
-    internal var mFillPaint: Paint
-    internal var mCenterFontMetrics: Paint.FontMetrics
-    internal var mLeftTextOffset: PointF
-    internal var mRightTextOffset: PointF
-    internal var mCenterTextOffset: PointF
+class StatusDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
+    private var mLeftTextPaint: Paint = createWeekDayPaint()
+    private var mRightTextPaint: Paint = createDatePaint()
+    private var mHalfHeightTextPaint: Paint = createHalfHeightDisplayPaint()
+    private var textOffsets: TextOffsets = getTextOffsets()
 
-    internal var mRoundBlockWidth: Float = 0.toFloat()
-    internal var mLineOffset: Float = 0.toFloat()
+    private fun getTextOffsets(): TextOffsets {
+        val leftTextMetrics = mLeftTextPaint.fontMetrics
 
-    init {
-        val resources = watch.resources
-        val desiredMinimumWidth = WallpaperManager.getInstance(watch).desiredMinimumWidth
+        // This text is to be drawn in cell 0, 1.
+        val leftCellOffset = this.getCellOffset(0, 1)
 
-        val leftTextSize = desiredMinimumWidth / 5.5f
+        // Calculate the difference on each side between the cell walls and the
+        // width of the text, in order to properly center the text horizontally.
+        val leftTextWidthDiff = (hudCellWidth - mLeftTextPaint.measureText("木")) / 2f
+
+        // Calculate the difference on each side between the cell walls and the height of
+        // the text, in order to properly center the text vertically.
+        val leftTextHeightDiff = (hudCellWidth - (leftTextMetrics.ascent + leftTextMetrics.descent)) / 2f
+
+        // The offset is simply the cell offset + the difference between the cell walls
+        // and the dimensions of the text.
+        val leftOffset = PointF(leftCellOffset.x + leftTextWidthDiff, leftCellOffset.y + leftTextHeightDiff)
+
+
+        val rightCellOffset = this.getCellOffset(0, 2) // actually 2.5 ish, but we will ignore the x.
+        val rightTextMetrics = mRightTextPaint.fontMetrics
+        val rightTextWidth = mRightTextPaint.measureText("000") / 2f
+        val rightTextHeightDiff = (hudCellWidth - (rightTextMetrics.ascent + rightTextMetrics.descent)) / 2f
+        val rightLeftOffset = edgeOffset + desiredMinimumWidth / 1.60f - rightTextWidth
+        // Here the x offset has been manually specified, but the top offset is the same principle
+        val rightOffset = PointF(rightLeftOffset, rightCellOffset.y + rightTextHeightDiff)
+
+
+        // Half height text is it's own special case.
+        val halfHeightTextWidth = mHalfHeightTextPaint.measureText("T") / 2f
+        val halfHeightTextHeight = (rightTextMetrics.ascent + rightTextMetrics.descent) / 2f
+        val halfHeightTopOffset = edgeOffset + hudCellWidth / 9f
+        val halfHeightLeftOffset = edgeOffset + desiredMinimumWidth / 2.25f - halfHeightTextWidth
+        val halfHeightOffset = PointF(halfHeightLeftOffset, halfHeightTopOffset - halfHeightTextHeight)
+
+        return TextOffsets(leftOffset, rightOffset, halfHeightOffset)
+    }
+
+    private fun createHalfHeightDisplayPaint(): Paint {
         val centerTextSize = desiredMinimumWidth / 12.0f
+        val halfHeightPaint = Paint()
+        halfHeightPaint.typeface = this.latinFont
+        halfHeightPaint.color = this.backgroundColor
+        halfHeightPaint.textSize = centerTextSize
+        halfHeightPaint.isAntiAlias = true
+        return halfHeightPaint
+    }
+
+    private fun createWeekDayPaint() : Paint {
         val textSize = desiredMinimumWidth / 5.5f
-        var typeface = Typeface.createFromAsset(watch.assets, "mplus-1m-regular.ttf")
-
-        // 塗りつぶし
-        mFillPaint = createTextPaint(resources.getColor(R.color.round))
-        mLineOffset = desiredMinimumWidth / 80f
-        mRoundBlockWidth = (desiredMinimumWidth - mLineOffset * 2f) / 5f
-
-        // 左側
-        mLeftTextPaint = Paint()
-
-        mLeftTextPaint.typeface = typeface
-        mLeftTextPaint.color = resources.getColor(R.color.round)
-        mLeftTextPaint.textSize = leftTextSize
-        mLeftTextPaint.isAntiAlias = true
-
-        // 右側
-        typeface = Typeface.createFromAsset(watch.assets, "Browning.ttf")
-        mRightTextPaint = Paint()
-
-        mRightTextPaint.typeface = typeface
-        mRightTextPaint.color = resources.getColor(R.color.digital_background)
-        mRightTextPaint.textSize = textSize
-        mRightTextPaint.isAntiAlias = true
-
-        // 中央
-        mCenterTextPaint = Paint()
-
-        mCenterTextPaint.typeface = typeface
-        mCenterTextPaint.color = resources.getColor(R.color.digital_background)
-        mCenterTextPaint.textSize = centerTextSize
-        mCenterTextPaint.isAntiAlias = true
-
-        var mFontMetrics: Paint.FontMetrics = mLeftTextPaint.fontMetrics
-        var halfTextWidth = mLeftTextPaint.measureText("木") / 2f
-        var halfTextHeight = (mFontMetrics.ascent + mFontMetrics.descent) / 2f
-        var top = mLineOffset + mRoundBlockWidth / 2f
-        var left = mLineOffset + mRoundBlockWidth + mRoundBlockWidth / 2f
-        mLeftTextOffset = PointF(left - halfTextWidth, top - halfTextHeight)
-
-        mFontMetrics = mRightTextPaint.fontMetrics
-        halfTextWidth = mRightTextPaint.measureText("000") / 2f
-        halfTextHeight = (mFontMetrics.ascent + mFontMetrics.descent) / 2f
-        left = mLineOffset + desiredMinimumWidth / 1.60f - halfTextWidth
-        mRightTextOffset = PointF(left, top - halfTextHeight)
-
-        mCenterFontMetrics = mCenterTextPaint.fontMetrics
-        halfTextWidth = mCenterTextPaint.measureText("T") / 2f
-        halfTextHeight = (mFontMetrics.ascent + mFontMetrics.descent) / 2f
-        top = mLineOffset + mRoundBlockWidth / 9f
-        left = mLineOffset + desiredMinimumWidth / 2.25f - halfTextWidth
-        mCenterTextOffset = PointF(left, top - halfTextHeight)
+        val paint = Paint(this.hudPaint)
+        paint.typeface = this.kanjiFont
+        paint.textSize = textSize
+        return paint
     }
 
-    fun setAntiAlias(mode: Boolean?) {
-        mFillPaint.isAntiAlias = mode!!
-        mLeftTextPaint.isAntiAlias = mode
-        // こっちはめちゃ汚くなる
-        // mCenterTextPaint.setAntiAlias(mode);
-        // mRightTextPaint.setAntiAlias(mode);
+    private fun createDatePaint() : Paint {
+        val textSize = desiredMinimumWidth / 5.5f
+        val paint = Paint()
+        paint.typeface = this.latinFont
+        paint.color = this.backgroundColor
+        paint.textSize = textSize
+        paint.isAntiAlias = true
+        return paint
     }
 
-    fun drawTime(canvas: Canvas?, time: Time) {
+    fun drawTime(canvas: Canvas?, time: WatchFaceTime) {
         val hour12 = if (time.hour > 11) time.hour - 12 else time.hour
         val text = (hour12 % 10).toString() + if (time.minute > 9)
             time.minute.toString()
         else
             "0" + time.minute.toString()
 
-        canvas?.drawRect(mRoundBlockWidth * 2f + mLineOffset,
-                mLineOffset,
-                mRoundBlockWidth * 4f + mLineOffset,
-                mRoundBlockWidth * 1f + mLineOffset,
-                mFillPaint
+        canvas?.drawRect(hudCellWidth * 2f + edgeOffset,
+                edgeOffset,
+                hudCellWidth * 4f + edgeOffset,
+                hudCellWidth * 1f + edgeOffset,
+                this.hudPaint
         )
-        canvas?.drawText("T", mCenterTextOffset.x, mCenterTextOffset.y, mCenterTextPaint)
+        canvas?.drawText("T", textOffsets.halfHeightTextOffset.x, textOffsets.halfHeightTextOffset.y, mHalfHeightTextPaint)
         if (time.hour > 11)
-            canvas?.drawText("P", mCenterTextOffset.x,
-                    mCenterTextOffset.y + (mLineOffset + mRoundBlockWidth / 3f),
-                    mCenterTextPaint
+            canvas?.drawText("P", textOffsets.halfHeightTextOffset.x,
+                    textOffsets.halfHeightTextOffset.y + (edgeOffset + hudCellWidth / 3f),
+                    mHalfHeightTextPaint
             )
         else
-            canvas?.drawText("A", mCenterTextOffset.x,
-                    mCenterTextOffset.y + (mLineOffset + mRoundBlockWidth / 3f),
-                    mCenterTextPaint
+            canvas?.drawText("A", textOffsets.halfHeightTextOffset.x,
+                    textOffsets.halfHeightTextOffset.y + (edgeOffset + hudCellWidth / 3f),
+                    mHalfHeightTextPaint
             )
-        canvas?.drawText(text, mRightTextOffset.x, mRightTextOffset.y, mRightTextPaint)
+        canvas?.drawText(text, textOffsets.rightTextOffset.x, textOffsets.rightTextOffset.y, mRightTextPaint)
     }
 
     fun drawDate(canvas: Canvas?, time: Time) {
@@ -129,26 +114,29 @@ class StatusDrawable(watch: WatchFace) {
         else
             "0" + time.monthDay.toString())
 
-        canvas?.drawRect(mRoundBlockWidth * 2f + mLineOffset, mLineOffset,
-                mRoundBlockWidth * 4f + mLineOffset,
-                mRoundBlockWidth * 1f + mLineOffset,
-                mFillPaint
+        val startOffset = this.getCellOffset(0, 2)
+        val endOffset = this.getCellOffset(1, 4)
+        canvas?.drawRect(startOffset.x, startOffset.y,
+                endOffset.x,
+                endOffset.y,
+                this.hudPaint
         )
-        canvas?.drawText("T", mCenterTextOffset.x, mCenterTextOffset.y, mCenterTextPaint)
-        canvas?.drawText("S", mCenterTextOffset.x,
-                mCenterTextOffset.y + (mLineOffset + mRoundBlockWidth / 3f),
-                mCenterTextPaint
+        canvas?.drawText("T", textOffsets.halfHeightTextOffset.x, textOffsets.halfHeightTextOffset.y,
+                mHalfHeightTextPaint)
+        canvas?.drawText("S", textOffsets.halfHeightTextOffset.x,
+                textOffsets.halfHeightTextOffset.y + (edgeOffset + hudCellWidth / 3f),
+                mHalfHeightTextPaint
         )
-        canvas?.drawText(text, mRightTextOffset.x, mRightTextOffset.y, mRightTextPaint)
+        canvas?.drawText(text, textOffsets.rightTextOffset.x, textOffsets.rightTextOffset.y, mRightTextPaint)
     }
 
     fun drawWeekDay(canvas: Canvas?, time: Time) {
         canvas?.drawText(getWeekDayKanji(time.weekDay),
-                mLeftTextOffset.x, mLeftTextOffset.y, mLeftTextPaint)
+                textOffsets.leftTextOffset.x, textOffsets.leftTextOffset.y, mLeftTextPaint)
     }
 
     private fun getWeekDayKanji(num: Int): String {
-        var c = ""
+        var c: String = ""
 
         when (num) {
             0 -> c = "曰"

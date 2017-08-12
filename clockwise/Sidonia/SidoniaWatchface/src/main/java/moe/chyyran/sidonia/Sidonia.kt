@@ -18,7 +18,6 @@ package moe.chyyran.sidonia
 
 import android.graphics.Canvas
 import com.ustwo.clockwise.WatchFace
-import com.ustwo.clockwise.WatchMode
 import moe.chyyran.sidonia.Drawables.*
 
 /**
@@ -45,8 +44,10 @@ class Sidonia : WatchFace() {
         mGrid.drawBackground(canvas)
         mStatus.drawWeekDay(canvas, this.time)
         mStatus.drawDate(canvas, this.time)
+        //mTime.drawStatus(canvas, 0, 0)
+        mBattery.drawBatteryPercent(canvas, 0, false)
         mTime.drawTime(canvas, this.time)
-        mBattery.drawBatteryPercent(canvas, 0, this.currentWatchMode == WatchMode.AMBIENT, true)
+
 
     }
 

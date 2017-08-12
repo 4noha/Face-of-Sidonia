@@ -2,6 +2,5 @@
 <resources>
     <color name="digital_background">#000000</color>
     <color name="alert">#ffff00</color>
-    <color name="round">#00ffff</color>
-    <color name="battery_charge">#ffff00</color>
+    <color name="hud">#00ffff</color>
 </resources>

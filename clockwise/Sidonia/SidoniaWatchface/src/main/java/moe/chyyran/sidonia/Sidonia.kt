@@ -17,6 +17,7 @@
 package moe.chyyran.sidonia
 
 import android.graphics.Canvas
+import android.graphics.Color
 import com.ustwo.clockwise.WatchFace
 import moe.chyyran.sidonia.Drawables.*
 
@@ -40,14 +41,13 @@ class Sidonia : WatchFace() {
     }
 
     override fun onDraw(canvas: Canvas?) {
-        mOverlay.drawOverlay(canvas)
-        mGrid.drawBackground(canvas)
+        canvas?.drawColor(Color.BLACK)
+        mBattery.drawBatteryPercent(canvas, 100, false)
+        mTime.drawTime(canvas, this.time)
+        mGrid.drawGrid(canvas)
         mStatus.drawWeekDay(canvas, this.time)
         mStatus.drawDate(canvas, this.time)
-        //mTime.drawStatus(canvas, 0, 0)
-        mBattery.drawBatteryPercent(canvas, 0, false)
-        mTime.drawTime(canvas, this.time)
-
+        mOverlay.drawOverlay(canvas)
 
     }
 

@@ -12,9 +12,8 @@ class StatusDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
     private var mLeftTextPaint: Paint = createWeekDayPaint()
     private var mRightTextPaint: Paint = createDatePaint()
     private var mHalfHeightTextPaint: Paint = createHalfHeightDisplayPaint()
-    private var textOffsets: TextOffsets = getTextOffsets()
 
-    private fun getTextOffsets(): TextOffsets {
+    private fun getTextOffsets(kanji: String, time: String): TextOffsets {
         val leftTextMetrics = mLeftTextPaint.fontMetrics
 
         // This text is to be drawn in cell 0, 1.
@@ -22,7 +21,7 @@ class StatusDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
 
         // Calculate the difference on each side between the cell walls and the
         // width of the text, in order to properly center the text horizontally.
-        val leftTextWidthDiff = (hudCellWidth - mLeftTextPaint.measureText("木")) / 2f
+        val leftTextWidthDiff = (hudCellWidth - mLeftTextPaint.measureText(kanji)) / 2f
 
         // Calculate the difference on each side between the cell walls and the height of
         // the text, in order to properly center the text vertically.
@@ -35,7 +34,7 @@ class StatusDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
 
         val rightCellOffset = this.getCellOffset(0, 2) // actually 2.5 ish, but we will ignore the x.
         val rightTextMetrics = mRightTextPaint.fontMetrics
-        val rightTextWidth = mRightTextPaint.measureText("000") / 2f
+        val rightTextWidth = mRightTextPaint.measureText(time) / 2f
         val rightTextHeightDiff = (hudCellWidth - (rightTextMetrics.ascent + rightTextMetrics.descent)) / 2f
         val rightLeftOffset = edgeOffset + desiredMinimumWidth / 1.60f - rightTextWidth
         // Here the x offset has been manually specified, but the top offset is the same principle
@@ -87,6 +86,7 @@ class StatusDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
         else
             "0" + time.minute.toString()
 
+        val textOffsets = getTextOffsets(getWeekDayKanji(time.weekDay), text)
         canvas?.drawRect(hudCellWidth * 2f + edgeOffset,
                 edgeOffset,
                 hudCellWidth * 4f + edgeOffset,
@@ -107,12 +107,13 @@ class StatusDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
         canvas?.drawText(text, textOffsets.rightTextOffset.x, textOffsets.rightTextOffset.y, mRightTextPaint)
     }
 
-    fun drawDate(canvas: Canvas?, time: Time) {
+    fun drawDate(canvas: Canvas?, time: WatchFaceTime) {
         // Months are zero-indexed, so we have to add one in order to correct for it.
         val text = ((time.month % 10) + 1).toString() + (if (time.monthDay > 9)
             time.monthDay.toString()
         else
             "0" + time.monthDay.toString())
+        val textOffsets = getTextOffsets(getWeekDayKanji(time.weekDay), text)
 
         val startOffset = this.getCellOffset(0, 2)
         val endOffset = this.getCellOffset(1, 4)
@@ -130,7 +131,13 @@ class StatusDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
         canvas?.drawText(text, textOffsets.rightTextOffset.x, textOffsets.rightTextOffset.y, mRightTextPaint)
     }
 
-    fun drawWeekDay(canvas: Canvas?, time: Time) {
+    fun drawWeekDay(canvas: Canvas?, time: WatchFaceTime) {
+        val text = ((time.month % 10) + 1).toString() + (if (time.monthDay > 9)
+            time.monthDay.toString()
+        else
+            "0" + time.monthDay.toString())
+        val textOffsets = getTextOffsets(getWeekDayKanji(time.weekDay), text)
+
         canvas?.drawText(getWeekDayKanji(time.weekDay),
                 textOffsets.leftTextOffset.x, textOffsets.leftTextOffset.y, mLeftTextPaint)
     }

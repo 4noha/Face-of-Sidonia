@@ -16,6 +16,8 @@ class BatteryDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
 
     init {
         val textSize = desiredMinimumWidth / 5.5f
+        val textNumSize = desiredMinimumWidth / 6f
+
         mTopBlockOffset = this.getCellOffset(1, 0)
 
         // 数字用
@@ -23,7 +25,7 @@ class BatteryDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
 
         mNumTextPaint.typeface = this.latinFont
         mNumTextPaint.color = this.backgroundColor
-        mNumTextPaint.textSize = textSize
+        mNumTextPaint.textSize = textNumSize
         mNumTextPaint.isAntiAlias = true
 
         // 文字用
@@ -56,11 +58,26 @@ class BatteryDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
             canvas?.drawText("電", mTopTextPoint.x - 2f, mTopTextPoint.y, mTextPaint)
             mTextPaint.color = this.hudColor
         } else {
+            // Fill the cell
             canvas?.drawRect(mTopBlockOffset.x, mTopBlockOffset.y,
                     mTopBlockOffset.x + hudCellWidth,
                     mTopBlockOffset.y + hudCellWidth, this.hudPaint)
-            canvas?.drawText(String.format("%02d", if (batteryPct != 100) batteryPct else 0),
-                    mTopNumPoint.x - 2f, mTopNumPoint.y, mNumTextPaint)
+
+            if(batteryPct < 100) {
+                val batteryPercentageString = String.format("%02d", batteryPct)
+                val numFontMetrics = mNumTextPaint.fontMetrics
+                // Calculate and measure the text every time.
+                val percentTextWidthDiff = (hudCellWidth - mNumTextPaint.measureText(batteryPercentageString)) / 2f
+                val percentTextHeightDiff = (hudCellWidth - (numFontMetrics.ascent + numFontMetrics.descent)) / 2f
+
+                val percentageOffset = PointF(mTopBlockOffset.x + percentTextWidthDiff,
+                        mTopBlockOffset.y + percentTextHeightDiff)
+                canvas?.drawText(batteryPercentageString, percentageOffset.x, percentageOffset.y, mNumTextPaint)
+            } else {
+                mTextPaint.color = this.backgroundColor
+                canvas?.drawText("満", mTopTextPoint.x - 2f, mTopTextPoint.y, mTextPaint)
+                mTextPaint.color = this.hudColor
+            }
         }
         canvas?.restore()
 

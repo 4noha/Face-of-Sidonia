@@ -39,7 +39,7 @@ class GridDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
             hudCellWidth * 4 + edgeOffset, hudCellWidth * 3 + 5, hudCellWidth * 4 + 8, hudCellWidth * 3 + edgeOffset, // 内側
             hudCellWidth * 4, hudCellWidth * 4 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 4, hudCellWidth * 5 + edgeOffset, hudCellWidth * 4 + 8, hudCellWidth * 5 + edgeOffset, hudCellWidth * 5, hudCellWidth * 0 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 0 + edgeOffset, hudCellWidth * 5, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 1 + edgeOffset, hudCellWidth * 5, hudCellWidth * 2 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 2 + edgeOffset, hudCellWidth * 5, hudCellWidth * 3 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 3 + edgeOffset, hudCellWidth * 5, hudCellWidth * 4 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 4 + edgeOffset, hudCellWidth * 5, hudCellWidth * 5 + edgeOffset, hudCellWidth * 5 + 8, hudCellWidth * 5 + edgeOffset)
 
-    fun drawBackground(canvas: Canvas?) {
+    fun drawGrid(canvas: Canvas?) {
         canvas?.save()
         canvas?.drawLines(mBackgroundLines, this.hudPaint)
         canvas?.drawLines(mBackgroundCrosshairs, this.hudBoldPaint)

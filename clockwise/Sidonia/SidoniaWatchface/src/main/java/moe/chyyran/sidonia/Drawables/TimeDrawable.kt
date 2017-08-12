@@ -35,6 +35,7 @@ class TimeDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
         mTextPaint.textSize = textSize
         val fontMetrics = mTextPaint.fontMetrics
         mTextPaint.color = alertColor
+        mTextPaint.isAntiAlias = true
 
         var halfTextWidth = mTextPaint.measureText("０") / 2f
         var halfTextHeight = (fontMetrics.ascent + fontMetrics.descent) / 2f

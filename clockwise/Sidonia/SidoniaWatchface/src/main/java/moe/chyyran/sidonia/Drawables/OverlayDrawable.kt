@@ -28,8 +28,8 @@ class OverlayDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
 
     fun drawOverlay(canvas: Canvas?) {
         canvas?.save()
-        drawCharacter(canvas, "圧", 2, 0, false, 2f)
-        drawCharacter(canvas, "温", 3, 0, false, 2f)
+        drawCharacter(canvas, "圧", 2, 0, false)
+        drawCharacter(canvas, "温", 3, 0, false)
         drawCharacter(canvas, "能", 4, 1)
         drawCharacter(canvas, "析", 4, 2)
         drawCharacter(canvas, "設", 4, 3)
@@ -40,18 +40,18 @@ class OverlayDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
         canvas?.restore()
     }
 
-    private fun drawCharacter(canvas: Canvas?, character: String, row: Int, column: Int, inverted: Boolean = false, offsetX: Float = 0f, offsetY: Float = 0f) {
+    private fun drawCharacter(canvas: Canvas?, character: String, row: Int, column: Int, inverted: Boolean = false) {
         canvas?.save()
         val cellOffset = this.getCellOffset(row, column)
         val characterOffset = PointF(cellOffset.x + overlayCharacterWidthDiff,
                 cellOffset.y + overlayCharacterHeightDiff)
         if(!inverted) {
-            canvas?.drawText(character, characterOffset.x - offsetX, characterOffset.y - offsetY, mTextPaint)
+            canvas?.drawText(character, characterOffset.x, characterOffset.y, mTextPaint)
         } else {
             canvas?.drawRect(cellOffset.x, cellOffset.y,
                     cellOffset.x + hudCellWidth,
                     cellOffset.y + hudCellWidth, this.hudPaint)
-            canvas?.drawText(character, characterOffset.x - offsetX, characterOffset.y - offsetY, mInvertedPaint)
+            canvas?.drawText(character, characterOffset.x, characterOffset.y, mInvertedPaint)
 
         }
         canvas?.restore()

@@ -20,6 +20,11 @@ import android.graphics.Canvas
 import android.graphics.Color
 import com.ustwo.clockwise.WatchFace
 import moe.chyyran.sidonia.Drawables.*
+import android.os.BatteryManager
+import android.content.Intent
+import android.content.IntentFilter
+import android.text.format.DateUtils
+
 
 /**
  * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
@@ -31,18 +36,23 @@ class Sidonia : WatchFace() {
     internal lateinit var mTime: TimeDrawable
     internal lateinit var mStatus: StatusDrawable
     internal lateinit var mBattery: BatteryDrawable
+    internal var mBatteryPct: Int = 0
+    internal var isCharging: Boolean = false
+
     override fun onCreate() {
         mGrid = GridDrawable(this)
         mOverlay = OverlayDrawable(this)
         mTime = TimeDrawable(this)
         mStatus = StatusDrawable(this)
         mBattery = BatteryDrawable(this)
+        updateBatteryStatus()
         super.onCreate()
     }
 
     override fun onDraw(canvas: Canvas?) {
+        this.updateBatteryStatus()
         canvas?.drawColor(Color.BLACK)
-        mBattery.drawBatteryPercent(canvas, 100, false)
+        mBattery.drawBatteryPercent(canvas, this.mBatteryPct, this.isCharging)
         mTime.drawTime(canvas, this.time)
         mGrid.drawGrid(canvas)
         mStatus.drawWeekDay(canvas, this.time)
@@ -51,8 +61,18 @@ class Sidonia : WatchFace() {
 
     }
 
-    // todo: Update refresh rate?
+    private fun updateBatteryStatus() {
+        val ifilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        val batteryStatus = applicationContext.registerReceiver(null, ifilter)
+        val status = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: 0
+        val level = batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: 0
+        val scale = batteryStatus?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: 0
+
+        mBatteryPct = level * 100 / scale
+        isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
+    }
+
     override fun getInteractiveModeUpdateRate(): Long {
-        return super.getInteractiveModeUpdateRate()
+        return DateUtils.SECOND_IN_MILLIS;
     }
 }

@@ -55,7 +55,7 @@ class BatteryDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
         canvas?.save()
         if (isCharging) {
             mTextPaint.color = this.alertColor
-            canvas?.drawText("電", mTopTextPoint.x - 2f, mTopTextPoint.y, mTextPaint)
+            canvas?.drawText("電", mTopTextPoint.x, mTopTextPoint.y, mTextPaint)
             mTextPaint.color = this.hudColor
         } else {
             // Fill the cell
@@ -75,7 +75,7 @@ class BatteryDrawable(watch: WatchFace) : SidoniaDrawable(watch) {
                 canvas?.drawText(batteryPercentageString, percentageOffset.x, percentageOffset.y, mNumTextPaint)
             } else {
                 mTextPaint.color = this.backgroundColor
-                canvas?.drawText("満", mTopTextPoint.x - 2f, mTopTextPoint.y, mTextPaint)
+                canvas?.drawText("満", mTopTextPoint.x, mTopTextPoint.y, mTextPaint)
                 mTextPaint.color = this.hudColor
             }
         }
